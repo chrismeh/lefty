@@ -48,6 +48,15 @@ func TestThomann_LoadProducts(t *testing.T) {
 		assert.Equal(t, uint(1), response.LastPage)
 	})
 
+	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
+		tho := newThomannForFixture(t, "thomann_basses_four_string_second_page.html")
+		response, err := tho.LoadProducts("4_saitige_linkshaender_e-baesse.html")
+		assert.NoError(t, err)
+
+		assert.Equal(t, uint(2), response.CurrentPage)
+		assert.Equal(t, uint(5), response.LastPage)
+	})
+
 	t.Run("use correct pagination settings when making the HTTP request", func(t *testing.T) {
 		httpSpy := testHTTPClient{
 			requestedURLs: make([]string, 0),
