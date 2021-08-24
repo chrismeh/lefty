@@ -47,13 +47,33 @@ func TestThomann_LoadProducts(t *testing.T) {
 		assert.Equal(t, uint(1), response.CurrentPage)
 		assert.Equal(t, uint(1), response.LastPage)
 	})
+
+	t.Run("use correct pagination settings when making the HTTP request", func(t *testing.T) {
+		httpSpy := testHTTPClient{
+			requestedURLs: make([]string, 0),
+			getFunc: func(url string) (*http.Response, error) {
+				return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
+			},
+		}
+		tho := Thomann{
+			http:    &httpSpy,
+			baseURL: "https://www.thomann.de/de",
+		}
+
+		_, _ = tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
+
+		assert.Len(t, httpSpy.requestedURLs, 1)
+		assert.Equal(t, "https://www.thomann.de/de/6_saitige_linkshaender_e-baesse.html?ls=100&pg=1", httpSpy.requestedURLs[0])
+	})
 }
 
-type stubHttpClient struct {
-	getFunc func(url string) (*http.Response, error)
+type testHTTPClient struct {
+	requestedURLs []string
+	getFunc       func(url string) (*http.Response, error)
 }
 
-func (s stubHttpClient) Get(url string) (*http.Response, error) {
+func (s *testHTTPClient) Get(url string) (*http.Response, error) {
+	s.requestedURLs = append(s.requestedURLs, url)
 	return s.getFunc(url)
 }
 
@@ -63,9 +83,12 @@ func newThomannForFixture(t *testing.T, filename string) Thomann {
 	testdata, err := ioutil.ReadFile(path.Join("testdata", filename))
 	assert.NoError(t, err)
 
-	httpClient := stubHttpClient{getFunc: func(url string) (*http.Response, error) {
-		return &http.Response{Body: ioutil.NopCloser(bytes.NewReader(testdata))}, nil
-	}}
+	httpClient := testHTTPClient{
+		requestedURLs: make([]string, 0),
+		getFunc: func(url string) (*http.Response, error) {
+			return &http.Response{Body: ioutil.NopCloser(bytes.NewReader(testdata))}, nil
+		},
+	}
 
-	return Thomann{http: httpClient}
+	return Thomann{http: &httpClient}
 }

@@ -19,7 +19,9 @@ type Thomann struct {
 }
 
 func (t Thomann) LoadProducts(category string) (ProductResponse, error) {
-	resp, err := t.http.Get(category)
+	url := fmt.Sprintf("%s/%s?ls=100&pg=1", t.baseURL, category)
+
+	resp, err := t.http.Get(url)
 	if err != nil {
 		return ProductResponse{}, fmt.Errorf("could not fetch products from thomann.de: %w", err)
 	}
