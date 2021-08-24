@@ -18,36 +18,42 @@ type Thomann struct {
 	baseURL string
 }
 
-func (t Thomann) LoadProducts(category string) ([]products.Product, error) {
+func (t Thomann) LoadProducts(category string) (ProductResponse, error) {
 	resp, err := t.http.Get(category)
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch products from thomann.de: %w", err)
+		return ProductResponse{}, fmt.Errorf("could not fetch products from thomann.de: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("could not read response body from thomann.de: %w", err)
+		return ProductResponse{}, fmt.Errorf("could not read response body from thomann.de: %w", err)
 	}
 
 	re := regexp.MustCompile(`(?ms)({"headline":.+?"})\], {"general`)
 	match := re.FindStringSubmatch(string(body))
 	if len(match) < 2 {
-		return nil, fmt.Errorf("unexpected response body structure")
+		return ProductResponse{}, fmt.Errorf("unexpected response body structure")
 	}
 
 	var p page
 	err = json.NewDecoder(strings.NewReader(match[1])).Decode(&p)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode response body: %w", err)
+		return ProductResponse{}, fmt.Errorf("failed to decode response body: %w", err)
 	}
 
-	return p.products(), nil
+	productResponse := ProductResponse{
+		Products:    p.products(),
+		CurrentPage: uint(p.Pagination.CurrentPage),
+		LastPage:    uint(p.Pagination.LastPage),
+	}
+	return productResponse, nil
 }
 
 type page struct {
 	Title       string      `json:"headline"`
 	ArticleList articleList `json:"articleListsSettings"`
+	Pagination  pagination  `json:"pagingSettings"`
 }
 
 func (p page) products() []products.Product {
@@ -108,4 +114,9 @@ type priceEntry struct {
 type image struct {
 	Name   string `json:"fname"`
 	Exists bool   `json:"exists"`
+}
+
+type pagination struct {
+	CurrentPage int `json:"currentPage"`
+	LastPage    int `json:"lastPage"`
 }

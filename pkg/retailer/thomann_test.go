@@ -18,8 +18,13 @@ func TestThomann_LoadProducts(t *testing.T) {
 	}}
 
 	tho := Thomann{http: httpClient}
-	products, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
+	response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
 	assert.NoError(t, err)
+
+	products := response.Products
+
+	assert.Equal(t, uint(1), response.CurrentPage)
+	assert.Equal(t, uint(1), response.LastPage)
 
 	assert.Len(t, products, 2)
 	assert.Equal(t, "Thomann", products[0].Retailer)
