@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -45,15 +46,33 @@ func (t Thomann) LoadProducts(category string) ([]products.Product, error) {
 }
 
 type page struct {
+	Title       string      `json:"headline"`
 	ArticleList articleList `json:"articleListsSettings"`
 }
 
 func (p page) products() []products.Product {
 	pr := make([]products.Product, len(p.ArticleList.Articles))
 	for k, v := range p.ArticleList.Articles {
+		price, err := strconv.ParseFloat(v.Price.Primary.Raw, 32)
+		if err != nil {
+			price = 0.00
+		}
+
+		var thumbnailURL string
+		if v.Image.Exists {
+			thumbnailURL = fmt.Sprintf("https://thumbs.static-thomann.de/thumb/thumb220x220/pics/prod/%s", v.Image.Name)
+		}
+
 		pr[k] = products.Product{
-			Manufacturer: v.Manufacturer,
-			Model:        v.Model,
+			Retailer:         "Thomann",
+			Manufacturer:     v.Manufacturer,
+			Model:            v.Model,
+			Category:         p.Title,
+			IsAvailable:      v.Availability.IsAvailable,
+			AvailabilityInfo: v.Availability.Text,
+			Price:            price,
+			ProductURL:       v.Link,
+			ThumbnailURL:     thumbnailURL,
 		}
 	}
 
@@ -65,6 +84,28 @@ type articleList struct {
 }
 
 type article struct {
-	Manufacturer string `json:"manufacturer"`
-	Model        string `json:"name"`
+	Manufacturer string       `json:"manufacturer"`
+	Model        string       `json:"name"`
+	Availability availability `json:"availability"`
+	Price        price        `json:"price"`
+	Link         string       `json:"link"`
+	Image        image        `json:"image"`
+}
+
+type availability struct {
+	IsAvailable bool   `json:"isAvailable"`
+	Text        string `json:"text"`
+}
+
+type price struct {
+	Primary priceEntry `json:"primary"`
+}
+
+type priceEntry struct {
+	Raw string `json:"raw"`
+}
+
+type image struct {
+	Name   string `json:"fname"`
+	Exists bool   `json:"exists"`
 }

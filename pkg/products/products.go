@@ -1,6 +1,13 @@
 package products
 
 type Product struct {
-	Manufacturer string
-	Model        string
+	Retailer         string
+	Manufacturer     string
+	Model            string
+	Category         string
+	IsAvailable      bool
+	AvailabilityInfo string
+	Price            float64
+	ProductURL       string
+	ThumbnailURL     string
 }
