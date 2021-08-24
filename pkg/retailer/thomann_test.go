@@ -11,7 +11,7 @@ import (
 
 func TestThomann_LoadProducts(t *testing.T) {
 	t.Run("parse all products on a product page", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_six_string.html")
+		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
 		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
 		assert.NoError(t, err)
 
@@ -40,7 +40,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_six_string.html")
+		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
 		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
 		assert.NoError(t, err)
 
@@ -49,7 +49,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_four_string_second_page.html")
+		tho := newThomannForFixture(t, "thomann_basses_four_strings_second_page.html")
 		response, err := tho.LoadProducts("4_saitige_linkshaender_e-baesse.html")
 		assert.NoError(t, err)
 
