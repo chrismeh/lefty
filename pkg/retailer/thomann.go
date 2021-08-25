@@ -18,10 +18,8 @@ type Thomann struct {
 	baseURL string
 }
 
-func (t Thomann) LoadProducts(category string) (ProductResponse, error) {
-	url := fmt.Sprintf("%s/%s?ls=100&pg=1", t.baseURL, category)
-
-	resp, err := t.http.Get(url)
+func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductResponse, error) {
+	resp, err := t.http.Get(t.buildURL(category, options))
 	if err != nil {
 		return ProductResponse{}, fmt.Errorf("could not fetch products from thomann.de: %w", err)
 	}
@@ -50,6 +48,17 @@ func (t Thomann) LoadProducts(category string) (ProductResponse, error) {
 		LastPage:    uint(p.Pagination.LastPage),
 	}
 	return productResponse, nil
+}
+
+func (t Thomann) buildURL(category string, options RequestOptions) string {
+	if options.ProductsPerPage == 0 {
+		options.ProductsPerPage = 100
+	}
+	if options.Page == 0 {
+		options.Page = 1
+	}
+
+	return fmt.Sprintf("%s/%s?ls=%d&pg=%d", t.baseURL, category, options.ProductsPerPage, options.Page)
 }
 
 type page struct {

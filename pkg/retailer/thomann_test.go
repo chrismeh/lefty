@@ -6,13 +6,14 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path"
+	"strings"
 	"testing"
 )
 
 func TestThomann_LoadProducts(t *testing.T) {
 	t.Run("parse all products on a product page", func(t *testing.T) {
 		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
-		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
+		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
 
 		products := response.Products
@@ -41,7 +42,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
 		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
-		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
+		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, uint(1), response.CurrentPage)
@@ -50,26 +51,52 @@ func TestThomann_LoadProducts(t *testing.T) {
 
 	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
 		tho := newThomannForFixture(t, "thomann_basses_four_strings_second_page.html")
-		response, err := tho.LoadProducts("4_saitige_linkshaender_e-baesse.html")
+		response, err := tho.LoadProducts("4_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, uint(2), response.CurrentPage)
 		assert.Equal(t, uint(5), response.LastPage)
 	})
 
-	t.Run("use correct pagination settings when making the HTTP request", func(t *testing.T) {
-		httpSpy := testHTTPClient{
-			getFunc: func(url string) (*http.Response, error) {
-				return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
+	t.Run("use correct pagination query parameters depending on RequestOptions struct", func(t *testing.T) {
+		tests := []struct {
+			Name              string
+			ProductsPerPage   uint
+			Page              uint
+			ExpectedURLSuffix string
+		}{
+			{
+				Name:              "zero-value RequestOptions",
+				ProductsPerPage:   0,
+				Page:              0,
+				ExpectedURLSuffix: "?ls=100&pg=1",
+			},
+			{
+				Name:              "valid RequestOptions",
+				ProductsPerPage:   50,
+				Page:              2,
+				ExpectedURLSuffix: "?ls=50&pg=2",
 			},
 		}
-		tho := Thomann{
-			http:    &httpSpy,
-			baseURL: "https://www.thomann.de/de",
-		}
 
-		_, _ = tho.LoadProducts("6_saitige_linkshaender_e-baesse.html")
-		assert.Equal(t, "https://www.thomann.de/de/6_saitige_linkshaender_e-baesse.html?ls=100&pg=1", httpSpy.lastURL)
+		for _, tt := range tests {
+			t.Run(tt.Name, func(t *testing.T) {
+				httpSpy := testHTTPClient{
+					getFunc: func(url string) (*http.Response, error) {
+						return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
+					},
+				}
+				tho := Thomann{
+					http:    &httpSpy,
+					baseURL: "https://www.thomann.de/de",
+				}
+
+				options := RequestOptions{ProductsPerPage: tt.ProductsPerPage, Page: tt.Page}
+				_, _ = tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)
+
+				assert.True(t, strings.HasSuffix(httpSpy.lastURL, tt.ExpectedURLSuffix))
+			})
+		}
 	})
 }
 
