@@ -100,7 +100,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 				options := RequestOptions{ProductsPerPage: tt.ProductsPerPage, Page: tt.Page}
 				_, _ = tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)
 
-				assert.True(t, strings.HasSuffix(httpSpy.lastURL, tt.ExpectedURLSuffix))
+				assert.Equal(t, tt.ExpectedURLSuffix, httpSpy.lastURL[strings.LastIndex(httpSpy.lastURL, "?"):])
 			})
 		}
 	})
