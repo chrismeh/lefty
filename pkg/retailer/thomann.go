@@ -30,7 +30,7 @@ func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductR
 		return ProductResponse{}, fmt.Errorf("could not read response body from thomann.de: %w", err)
 	}
 
-	re := regexp.MustCompile(`(?ms)({"headline":.+?"})\], {"general`)
+	re := regexp.MustCompile(`(?ms)({"headline":.+?"})], {"general`)
 	match := re.FindStringSubmatch(string(body))
 	if len(match) < 2 {
 		return ProductResponse{}, fmt.Errorf("unexpected response body structure")
