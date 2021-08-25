@@ -42,6 +42,10 @@ func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductR
 		return ProductResponse{}, fmt.Errorf("failed to decode response body: %w", err)
 	}
 
+	if uint(p.Pagination.LastPage) < options.Page {
+		return ProductResponse{}, fmt.Errorf("page %d out of bounds, last page is %d", options.Page, p.Pagination.LastPage)
+	}
+
 	productResponse := ProductResponse{
 		Products:    p.products(),
 		CurrentPage: uint(p.Pagination.CurrentPage),

@@ -104,6 +104,15 @@ func TestThomann_LoadProducts(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("return error when page is out of bounds", func(t *testing.T) {
+		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
+
+		options := RequestOptions{ProductsPerPage: 100, Page: 1337}
+		_, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)
+
+		assert.Error(t, err)
+	})
 }
 
 type testHTTPClient struct {
