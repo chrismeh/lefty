@@ -77,6 +77,12 @@ func TestThomann_LoadProducts(t *testing.T) {
 				Page:              2,
 				ExpectedURLSuffix: "?ls=50&pg=2",
 			},
+			{
+				Name:              "ProductsPerPage not permitted by retailer",
+				ProductsPerPage:   10,
+				Page:              1,
+				ExpectedURLSuffix: "?ls=100&pg=1",
+			},
 		}
 
 		for _, tt := range tests {

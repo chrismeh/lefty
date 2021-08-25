@@ -51,14 +51,22 @@ func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductR
 }
 
 func (t Thomann) buildURL(category string, options RequestOptions) string {
-	if options.ProductsPerPage == 0 {
-		options.ProductsPerPage = 100
-	}
-	if options.Page == 0 {
-		options.Page = 1
+	var productsPerPage uint = 100
+	var page uint = 1
+
+	validProductsPerPage := []uint{25, 50, 100}
+	for _, v := range validProductsPerPage {
+		if options.ProductsPerPage == v {
+			productsPerPage = v
+			break
+		}
 	}
 
-	return fmt.Sprintf("%s/%s?ls=%d&pg=%d", t.baseURL, category, options.ProductsPerPage, options.Page)
+	if options.Page > 0 {
+		page = options.Page
+	}
+
+	return fmt.Sprintf("%s/%s?ls=%d&pg=%d", t.baseURL, category, productsPerPage, page)
 }
 
 type page struct {
