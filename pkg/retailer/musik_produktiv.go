@@ -17,8 +17,8 @@ type MusikProduktiv struct {
 	manufacturers []string
 }
 
-func (m *MusikProduktiv) LoadProducts(category string) (ProductResponse, error) {
-	resp, err := m.http.Get(fmt.Sprintf("https://www.musik-produktiv.de/%s", category))
+func (m *MusikProduktiv) LoadProducts(category string, options RequestOptions) (ProductResponse, error) {
+	resp, err := m.http.Get(m.buildURL(category, options))
 	if err != nil {
 		return ProductResponse{}, fmt.Errorf("could not fetch products from musik-produktiv.de: %w", err)
 	}
@@ -58,6 +58,16 @@ func (m *MusikProduktiv) LoadProducts(category string) (ProductResponse, error) 
 		CurrentPage: uint(currentPage),
 		LastPage:    uint(lastPage),
 	}, nil
+}
+
+func (m *MusikProduktiv) buildURL(category string, options RequestOptions) string {
+	var page uint = 1
+
+	if options.Page > 0 {
+		page = options.Page
+	}
+
+	return fmt.Sprintf("https://www.musik-produktiv.de/%s/?p=%d", category, page)
 }
 
 func (m *MusikProduktiv) parseProduct(s *goquery.Selection) (products.Product, error) {

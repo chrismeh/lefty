@@ -1,7 +1,11 @@
 package retailer
 
 import (
+	"bytes"
 	"github.com/stretchr/testify/assert"
+	"io/ioutil"
+	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -9,7 +13,7 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	t.Run("parse product from product page", func(t *testing.T) {
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_eight_strings.html")}
 
-		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Len(t, response.Products, 1)
@@ -27,7 +31,7 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	t.Run("parse model and manufacturer titles when manufacturer name contains spaces", func(t *testing.T) {
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
 
-		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Len(t, response.Products, 20)
@@ -38,7 +42,7 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_eight_strings.html")}
 
-		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, uint(1), response.CurrentPage)
@@ -48,7 +52,7 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
 
-		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, uint(2), response.CurrentPage)
@@ -58,10 +62,45 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	t.Run("parse pagination on the last page", func(t *testing.T) {
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_last_page.html")}
 
-		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, uint(6), response.CurrentPage)
 		assert.Equal(t, uint(6), response.LastPage)
+	})
+
+	t.Run("use correct pagination query parameters depending on RequestOptions struct", func(t *testing.T) {
+		tests := []struct {
+			Name              string
+			Page              uint
+			ExpectedURLSuffix string
+		}{
+			{
+				Name:              "zero-value RequestOptions",
+				Page:              0,
+				ExpectedURLSuffix: "?p=1",
+			},
+			{
+				Name:              "valid RequestOptions",
+				Page:              2,
+				ExpectedURLSuffix: "?p=2",
+			},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.Name, func(t *testing.T) {
+				httpSpy := testHTTPClient{
+					getFunc: func(url string) (*http.Response, error) {
+						return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
+					},
+				}
+				mp := MusikProduktiv{http: &httpSpy}
+
+				options := RequestOptions{Page: tt.Page}
+				_, _ = mp.LoadProducts("e-gitarre-linkshaender", options)
+
+				assert.Equal(t, tt.ExpectedURLSuffix, httpSpy.lastURL[strings.LastIndex(httpSpy.lastURL, "?"):])
+			})
+		}
 	})
 }
