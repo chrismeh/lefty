@@ -48,7 +48,16 @@ func (m *MusikProduktiv) LoadProducts(category string) (ProductResponse, error) 
 		instruments[i] = p
 	})
 
-	return ProductResponse{Products: instruments}, nil
+	currentPage, lastPage, err := m.parsePagination(doc)
+	if err != nil {
+		return ProductResponse{}, err
+	}
+
+	return ProductResponse{
+		Products:    instruments,
+		CurrentPage: uint(currentPage),
+		LastPage:    uint(lastPage),
+	}, nil
 }
 
 func (m *MusikProduktiv) parseProduct(s *goquery.Selection) (products.Product, error) {
@@ -90,4 +99,26 @@ func (m *MusikProduktiv) parsePrice(price string) (float64, error) {
 	}
 
 	return fPrice, nil
+}
+
+func (m *MusikProduktiv) parsePagination(s *goquery.Document) (currentPage, lastPage int, err error) {
+	pagination := s.Find(".list_page div")
+	if len(pagination.Nodes) == 1 {
+		return 1, 1, nil
+	}
+
+	cp := pagination.Find("div").Text()
+	lp := pagination.Find("a").Last().Text()
+
+	currentPage, err = strconv.Atoi(cp)
+	if err != nil {
+		return 0, 0, fmt.Errorf("could not parse current page from pagination: %w", err)
+	}
+
+	lastPage, err = strconv.Atoi(lp)
+	if err != nil {
+		return 0, 0, fmt.Errorf("could not parse last page from pagination: %w", err)
+	}
+
+	return currentPage, lastPage, nil
 }

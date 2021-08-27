@@ -34,4 +34,24 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 		assert.Equal(t, "Gretsch Guitars", response.Products[14].Manufacturer)
 		assert.Equal(t, "G5230LH Electromatic LH Jet FT ASLV", response.Products[14].Model)
 	})
+
+	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
+		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_eight_strings.html")}
+
+		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		assert.NoError(t, err)
+
+		assert.Equal(t, uint(1), response.CurrentPage)
+		assert.Equal(t, uint(1), response.LastPage)
+	})
+
+	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
+		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
+
+		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		assert.NoError(t, err)
+
+		assert.Equal(t, uint(2), response.CurrentPage)
+		assert.Equal(t, uint(6), response.LastPage)
+	})
 }
