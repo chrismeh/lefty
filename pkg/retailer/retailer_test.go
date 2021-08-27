@@ -82,6 +82,36 @@ func TestLoadProducts(t *testing.T) {
 		assert.Equal(t, "AM Pro II P Bass MN MYS SFG LH", prds[0].Model)
 		assert.Equal(t, "LTD TE-200 Maple STBC LH", prds[1].Model)
 	})
+
+	t.Run("return products for multiple categories with multiple pages", func(t *testing.T) {
+		retailer.CategoriesFunc = func() []string { return []string{"basses", "guitars"} }
+		retailer.LoadProductsFunc = func(category string, options RequestOptions) (ProductResponse, error) {
+			var p products.Product
+			productPageMap := map[string]map[uint]products.Product{
+				"guitars": {
+					1: products.Product{Manufacturer: "Fender", Model: "AM Pro II Tele LH MN MYST SFG"},
+					2: products.Product{Manufacturer: "Schecter", Model: "C-1 Hellraiser FR BCH LH"},
+				},
+				"basses": {
+					1: products.Product{Manufacturer: "Fender", Model: "AM Pro II P Bass MN MYS SFG LH"},
+					2: products.Product{Manufacturer: "Sterling by Music Man", Model: "StingRay 5 LH MN VSB"},
+				},
+			}
+
+			p = productPageMap[category][options.Page]
+			pr := ProductResponse{Products: []products.Product{p}, CurrentPage: options.Page, LastPage: 2}
+			return pr, nil
+		}
+
+		prds, err := LoadProducts(retailer)
+		assert.NoError(t, err)
+
+		assert.Len(t, prds, 4)
+		assert.Equal(t, "AM Pro II P Bass MN MYS SFG LH", prds[0].Model)
+		assert.Equal(t, "StingRay 5 LH MN VSB", prds[1].Model)
+		assert.Equal(t, "AM Pro II Tele LH MN MYST SFG", prds[2].Model)
+		assert.Equal(t, "C-1 Hellraiser FR BCH LH", prds[3].Model)
+	})
 }
 
 type stubRetailer struct {
