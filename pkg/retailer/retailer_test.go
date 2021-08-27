@@ -14,13 +14,33 @@ func TestUpdateRetailers(t *testing.T) {
 		return ProductResponse{Products: []products.Product{p}, CurrentPage: 1, LastPage: 1}, nil
 	}
 
-	store := &testProductStore{}
+	t.Run("store products for a single retailer", func(t *testing.T) {
+		store := &testProductStore{}
 
-	err := UpdateRetailers(store, retailer)
-	assert.NoError(t, err)
+		err := UpdateRetailers(store, retailer)
+		assert.NoError(t, err)
 
-	assert.Len(t, store.Products, 1)
-	assert.Equal(t, products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}, store.Products[0])
+		assert.Len(t, store.Products, 1)
+		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", store.Products[0].Model)
+	})
+
+	t.Run("store products for multiple retailers", func(t *testing.T) {
+		store := &testProductStore{}
+
+		r := stubRetailer{}
+		r.CategoriesFunc = func() []string { return []string{"basses"} }
+		r.LoadProductsFunc = func(category string, options RequestOptions) (ProductResponse, error) {
+			p := products.Product{Manufacturer: "Fender", Model: "AM Pro II P Bass MN MYS SFG LH"}
+			return ProductResponse{Products: []products.Product{p}, CurrentPage: 1, LastPage: 1}, nil
+		}
+
+		err := UpdateRetailers(store, retailer, r)
+		assert.NoError(t, err)
+
+		assert.Len(t, store.Products, 2)
+		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", store.Products[0].Model)
+		assert.Equal(t, "AM Pro II P Bass MN MYS SFG LH", store.Products[1].Model)
+	})
 }
 
 func TestLoadProducts(t *testing.T) {
