@@ -11,7 +11,11 @@ import (
 )
 
 func TestThomann_LoadProducts(t *testing.T) {
+	t.Parallel()
+
 	t.Run("parse all products on a product page", func(t *testing.T) {
+		t.Parallel()
+
 		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
@@ -41,6 +45,8 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
+		t.Parallel()
+
 		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
@@ -50,6 +56,8 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
+		t.Parallel()
+
 		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_four_strings_second_page.html")}
 		response, err := tho.LoadProducts("4_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
@@ -59,6 +67,8 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("use correct pagination query parameters depending on RequestOptions struct", func(t *testing.T) {
+		t.Parallel()
+
 		tests := []struct {
 			Name              string
 			Page              uint
@@ -78,6 +88,8 @@ func TestThomann_LoadProducts(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.Name, func(t *testing.T) {
+				t.Parallel()
+
 				httpSpy := testHTTPClient{
 					getFunc: func(url string) (*http.Response, error) {
 						return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
@@ -94,6 +106,8 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("return error when page is out of bounds", func(t *testing.T) {
+		t.Parallel()
+
 		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 
 		options := RequestOptions{Page: 1337}

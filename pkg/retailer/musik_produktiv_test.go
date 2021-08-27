@@ -10,7 +10,11 @@ import (
 )
 
 func TestMusikProduktiv_LoadProducts(t *testing.T) {
+	t.Parallel()
+
 	t.Run("parse product from product page", func(t *testing.T) {
+		t.Parallel()
+
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_eight_strings.html")}
 
 		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
@@ -29,6 +33,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse model and manufacturer titles when manufacturer name contains spaces", func(t *testing.T) {
+		t.Parallel()
+
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
 
 		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
@@ -40,6 +46,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
+		t.Parallel()
+
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_eight_strings.html")}
 
 		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
@@ -50,6 +58,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
+		t.Parallel()
+
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
 
 		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
@@ -60,6 +70,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination on the last page", func(t *testing.T) {
+		t.Parallel()
+
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_last_page.html")}
 
 		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
@@ -70,6 +82,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("use correct pagination query parameters depending on RequestOptions struct", func(t *testing.T) {
+		t.Parallel()
+
 		tests := []struct {
 			Name              string
 			Page              uint
@@ -89,6 +103,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.Name, func(t *testing.T) {
+				t.Parallel()
+
 				httpSpy := testHTTPClient{
 					getFunc: func(url string) (*http.Response, error) {
 						return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
@@ -105,6 +121,8 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("return error when page is out of bounds", func(t *testing.T) {
+		t.Parallel()
+
 		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
 
 		options := RequestOptions{Page: 1337}
