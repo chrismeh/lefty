@@ -1,23 +1,12 @@
 package retailer
 
 import (
-	"bytes"
 	"github.com/stretchr/testify/assert"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"path"
 	"testing"
 )
 
 func TestMusikProduktiv_LoadProducts(t *testing.T) {
-	testdata, err := os.ReadFile(path.Join("testdata", "musikproduktiv_guitar_eight_strings.html"))
-	assert.NoError(t, err)
-
-	httpStub := testHTTPClient{getFunc: func(url string) (*http.Response, error) {
-		return &http.Response{Body: ioutil.NopCloser(bytes.NewReader(testdata))}, nil
-	}}
-	mp := MusikProduktiv{&httpStub}
+	mp := MusikProduktiv{newTestHTTPClientForFixture("musikproduktiv_guitar_eight_strings.html")}
 
 	response, err := mp.LoadProducts("e-gitarre-linkshaender")
 	assert.NoError(t, err)

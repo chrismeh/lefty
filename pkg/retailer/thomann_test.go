@@ -12,7 +12,7 @@ import (
 
 func TestThomann_LoadProducts(t *testing.T) {
 	t.Run("parse all products on a product page", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
+		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
 
@@ -41,7 +41,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
+		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 		response, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
 
@@ -50,7 +50,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse pagination when there are multiple pages", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_four_strings_second_page.html")
+		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_four_strings_second_page.html")}
 		response, err := tho.LoadProducts("4_saitige_linkshaender_e-baesse.html", RequestOptions{})
 		assert.NoError(t, err)
 
@@ -103,7 +103,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("return error when page is out of bounds", func(t *testing.T) {
-		tho := newThomannForFixture(t, "thomann_basses_six_strings.html")
+		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 
 		options := RequestOptions{ProductsPerPage: 100, Page: 1337}
 		_, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)
@@ -122,17 +122,15 @@ func (s *testHTTPClient) Get(url string) (*http.Response, error) {
 	return s.getFunc(url)
 }
 
-func newThomannForFixture(t *testing.T, filename string) Thomann {
-	t.Helper()
+func newTestHTTPClientForFixture(fixture string) *testHTTPClient {
+	testdata, err := ioutil.ReadFile(path.Join("testdata", fixture))
+	if err != nil {
+		panic(err)
+	}
 
-	testdata, err := ioutil.ReadFile(path.Join("testdata", filename))
-	assert.NoError(t, err)
-
-	httpClient := testHTTPClient{
+	return &testHTTPClient{
 		getFunc: func(url string) (*http.Response, error) {
 			return &http.Response{Body: ioutil.NopCloser(bytes.NewReader(testdata))}, nil
 		},
 	}
-
-	return Thomann{http: &httpClient}
 }
