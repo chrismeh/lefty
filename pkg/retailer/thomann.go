@@ -57,14 +57,6 @@ func (t Thomann) buildURL(category string, options RequestOptions) string {
 	var productsPerPage uint = 100
 	var page uint = 1
 
-	validProductsPerPage := []uint{25, 50, 100}
-	for _, v := range validProductsPerPage {
-		if options.ProductsPerPage == v {
-			productsPerPage = v
-			break
-		}
-	}
-
 	if options.Page > 0 {
 		page = options.Page
 	}

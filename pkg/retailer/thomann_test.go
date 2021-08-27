@@ -61,27 +61,18 @@ func TestThomann_LoadProducts(t *testing.T) {
 	t.Run("use correct pagination query parameters depending on RequestOptions struct", func(t *testing.T) {
 		tests := []struct {
 			Name              string
-			ProductsPerPage   uint
 			Page              uint
 			ExpectedURLSuffix string
 		}{
 			{
 				Name:              "zero-value RequestOptions",
-				ProductsPerPage:   0,
 				Page:              0,
 				ExpectedURLSuffix: "?ls=100&pg=1",
 			},
 			{
 				Name:              "valid RequestOptions",
-				ProductsPerPage:   50,
 				Page:              2,
-				ExpectedURLSuffix: "?ls=50&pg=2",
-			},
-			{
-				Name:              "ProductsPerPage not permitted by retailer",
-				ProductsPerPage:   10,
-				Page:              1,
-				ExpectedURLSuffix: "?ls=100&pg=1",
+				ExpectedURLSuffix: "?ls=100&pg=2",
 			},
 		}
 
@@ -94,7 +85,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 				}
 				tho := Thomann{http: &httpSpy}
 
-				options := RequestOptions{ProductsPerPage: tt.ProductsPerPage, Page: tt.Page}
+				options := RequestOptions{Page: tt.Page}
 				_, _ = tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)
 
 				assert.Equal(t, tt.ExpectedURLSuffix, httpSpy.lastURL[strings.LastIndex(httpSpy.lastURL, "?"):])
@@ -105,7 +96,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 	t.Run("return error when page is out of bounds", func(t *testing.T) {
 		tho := Thomann{newTestHTTPClientForFixture("thomann_basses_six_strings.html")}
 
-		options := RequestOptions{ProductsPerPage: 100, Page: 1337}
+		options := RequestOptions{Page: 1337}
 		_, err := tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)
 
 		assert.Error(t, err)

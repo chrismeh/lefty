@@ -3,8 +3,7 @@ package retailer
 import "github.com/chrismeh/lefty/pkg/products"
 
 type RequestOptions struct {
-	ProductsPerPage uint
-	Page            uint
+	Page uint
 }
 
 type ProductResponse struct {
