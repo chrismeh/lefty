@@ -7,6 +7,15 @@ type Retailer interface {
 	Categories() []string
 }
 
+func UpdateRetailers(ps products.Store, r Retailer) error {
+	prds, err := LoadProducts(r)
+	if err != nil {
+		return err
+	}
+
+	return ps.Upsert(prds)
+}
+
 func LoadProducts(r Retailer) ([]products.Product, error) {
 	prds := make([]products.Product, 0)
 

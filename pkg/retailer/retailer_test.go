@@ -6,6 +6,23 @@ import (
 	"testing"
 )
 
+func TestUpdateRetailers(t *testing.T) {
+	retailer := stubRetailer{}
+	retailer.CategoriesFunc = func() []string { return []string{"guitars"} }
+	retailer.LoadProductsFunc = func(category string, options RequestOptions) (ProductResponse, error) {
+		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+		return ProductResponse{Products: []products.Product{p}, CurrentPage: 1, LastPage: 1}, nil
+	}
+
+	store := &testProductStore{}
+
+	err := UpdateRetailers(store, retailer)
+	assert.NoError(t, err)
+
+	assert.Len(t, store.Products, 1)
+	assert.Equal(t, products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}, store.Products[0])
+}
+
 func TestLoadProducts(t *testing.T) {
 	retailer := stubRetailer{}
 	retailer.CategoriesFunc = func() []string {
@@ -112,6 +129,16 @@ func TestLoadProducts(t *testing.T) {
 		assert.Equal(t, "AM Pro II Tele LH MN MYST SFG", prds[2].Model)
 		assert.Equal(t, "C-1 Hellraiser FR BCH LH", prds[3].Model)
 	})
+}
+
+type testProductStore struct {
+	Products []products.Product
+}
+
+func (t *testProductStore) Upsert(prds []products.Product) error {
+	t.Products = make([]products.Product, len(prds))
+	copy(t.Products, prds)
+	return nil
 }
 
 type stubRetailer struct {

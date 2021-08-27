@@ -1,5 +1,9 @@
 package products
 
+type Store interface {
+	Upsert(products []Product) error
+}
+
 type Product struct {
 	Retailer         string
 	Manufacturer     string
