@@ -25,14 +25,14 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 	})
 
 	t.Run("parse model and manufacturer titles when manufacturer name contains spaces", func(t *testing.T) {
-		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars.html")}
+		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
 
 		response, err := mp.LoadProducts("e-gitarre-linkshaender")
 		assert.NoError(t, err)
 
 		assert.Len(t, response.Products, 20)
-		assert.Equal(t, "Gretsch Guitars", response.Products[14].Manufacturer)
-		assert.Equal(t, "G5230LH Electromatic LH Jet FT ASLV", response.Products[14].Model)
+		assert.Equal(t, "ESP LTD", response.Products[0].Manufacturer)
+		assert.Equal(t, "Signature Iron Cross J.Hetfield Lefthand", response.Products[0].Model)
 	})
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {
