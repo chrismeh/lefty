@@ -103,4 +103,13 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("return error when page is out of bounds", func(t *testing.T) {
+		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_second_page.html")}
+
+		options := RequestOptions{Page: 1337}
+		_, err := mp.LoadProducts("e-gitarre-linkshaender", options)
+
+		assert.Error(t, err)
+	})
 }

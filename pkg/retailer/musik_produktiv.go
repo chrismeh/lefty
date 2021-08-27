@@ -30,6 +30,15 @@ func (m *MusikProduktiv) LoadProducts(category string, options RequestOptions) (
 	}
 	categoryName := doc.Find("div.list_title h1").Text()
 
+	currentPage, lastPage, err := m.parsePagination(doc)
+	if err != nil {
+		return ProductResponse{}, err
+	}
+
+	if uint(lastPage) < options.Page {
+		return ProductResponse{}, fmt.Errorf("page %d out of bounds, last page is %d", options.Page, lastPage)
+	}
+
 	manufacturerNodes := doc.Find(".mp-filtermenu ul").First().Find("li span")
 	m.manufacturers = make([]string, len(manufacturerNodes.Nodes))
 	manufacturerNodes.Each(func(i int, s *goquery.Selection) {
@@ -47,11 +56,6 @@ func (m *MusikProduktiv) LoadProducts(category string, options RequestOptions) (
 		p.Category = categoryName
 		instruments[i] = p
 	})
-
-	currentPage, lastPage, err := m.parsePagination(doc)
-	if err != nil {
-		return ProductResponse{}, err
-	}
 
 	return ProductResponse{
 		Products:    instruments,
