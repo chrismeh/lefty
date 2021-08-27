@@ -108,7 +108,7 @@ func (m *MusikProduktiv) parsePagination(s *goquery.Document) (currentPage, last
 	}
 
 	cp := pagination.Find("div").Text()
-	lp := pagination.Find("a").Last().Text()
+	lp := pagination.Children().Last().Text()
 
 	currentPage, err = strconv.Atoi(cp)
 	if err != nil {

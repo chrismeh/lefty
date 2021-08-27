@@ -54,4 +54,14 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 		assert.Equal(t, uint(2), response.CurrentPage)
 		assert.Equal(t, uint(6), response.LastPage)
 	})
+
+	t.Run("parse pagination on the last page", func(t *testing.T) {
+		mp := MusikProduktiv{http: newTestHTTPClientForFixture("musikproduktiv_guitars_last_page.html")}
+
+		response, err := mp.LoadProducts("e-gitarre-linkshaender")
+		assert.NoError(t, err)
+
+		assert.Equal(t, uint(6), response.CurrentPage)
+		assert.Equal(t, uint(6), response.LastPage)
+	})
 }
