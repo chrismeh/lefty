@@ -7,12 +7,26 @@ type Retailer interface {
 }
 
 func LoadProducts(r Retailer) ([]products.Product, error) {
-	resp, err := r.LoadProducts("guitars", RequestOptions{})
+	var page uint = 1
+	resp, err := r.LoadProducts("guitars", RequestOptions{Page: page})
 	if err != nil {
 		return nil, err
 	}
 
-	return resp.Products, nil
+	prds := make([]products.Product, len(resp.Products))
+	copy(prds, resp.Products)
+
+	for page < resp.LastPage {
+		page++
+		resp, err = r.LoadProducts("guitars", RequestOptions{Page: page})
+		if err != nil {
+			return nil, err
+		}
+
+		prds = append(prds, resp.Products...)
+	}
+
+	return prds, nil
 }
 
 type RequestOptions struct {
