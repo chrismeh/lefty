@@ -53,6 +53,17 @@ func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductR
 	return productResponse, nil
 }
 
+func (t Thomann) Categories() []string {
+	return []string{
+		"linkshaender_modelle.html",
+		"linkshaender_konzertgitarren.html",
+		"linkshaender_akustikgitarren.html",
+		"4_saitige_linkshaender_e-baesse.html",
+		"5_saitige_linkshaender_e-baesse.html",
+		"6_saitige_linkshaender_e-baesse.html",
+	}
+}
+
 func (t Thomann) buildURL(category string, options RequestOptions) string {
 	var productsPerPage uint = 100
 	var page uint = 1

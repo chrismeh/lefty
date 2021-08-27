@@ -64,6 +64,15 @@ func (m *MusikProduktiv) LoadProducts(category string, options RequestOptions) (
 	}, nil
 }
 
+func (m *MusikProduktiv) Categories() []string {
+	return []string{
+		"e-gitarre-linkshaender",
+		"westerngitarre-linkshaender",
+		"linkshaender-konzertgitarren",
+		"e-bass-linkshaender",
+	}
+}
+
 func (m *MusikProduktiv) buildURL(category string, options RequestOptions) string {
 	var page uint = 1
 
