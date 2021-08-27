@@ -92,10 +92,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 						return &http.Response{Body: ioutil.NopCloser(bytes.NewBufferString(""))}, nil
 					},
 				}
-				tho := Thomann{
-					http:    &httpSpy,
-					baseURL: "https://www.thomann.de/de",
-				}
+				tho := Thomann{http: &httpSpy}
 
 				options := RequestOptions{ProductsPerPage: tt.ProductsPerPage, Page: tt.Page}
 				_, _ = tho.LoadProducts("6_saitige_linkshaender_e-baesse.html", options)

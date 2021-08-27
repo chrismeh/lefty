@@ -15,7 +15,6 @@ type Thomann struct {
 	http interface {
 		Get(url string) (*http.Response, error)
 	}
-	baseURL string
 }
 
 func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductResponse, error) {
@@ -70,7 +69,7 @@ func (t Thomann) buildURL(category string, options RequestOptions) string {
 		page = options.Page
 	}
 
-	return fmt.Sprintf("%s/%s?ls=%d&pg=%d", t.baseURL, category, productsPerPage, page)
+	return fmt.Sprintf("https://www.thomann.de/de/%s?ls=%d&pg=%d", category, productsPerPage, page)
 }
 
 type page struct {
