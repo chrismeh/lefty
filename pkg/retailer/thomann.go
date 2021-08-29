@@ -14,6 +14,10 @@ type Thomann struct {
 	http httpGetter
 }
 
+func NewThomann(http httpGetter) Thomann {
+	return Thomann{http: http}
+}
+
 func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductResponse, error) {
 	resp, err := t.http.Get(t.buildURL(category, options))
 	if err != nil {

@@ -14,6 +14,10 @@ type MusikProduktiv struct {
 	manufacturers []string
 }
 
+func NewMusikProduktiv(http httpGetter) *MusikProduktiv {
+	return &MusikProduktiv{http: http}
+}
+
 func (m *MusikProduktiv) LoadProducts(category string, options RequestOptions) (ProductResponse, error) {
 	resp, err := m.http.Get(m.buildURL(category, options))
 	if err != nil {
