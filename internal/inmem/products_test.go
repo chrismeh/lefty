@@ -8,6 +8,18 @@ import (
 	"time"
 )
 
+func TestProductStore_FindAll(t *testing.T) {
+	p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+	store := ProductStore{products: map[string]products.Product{buildProductKey(p): p}, mu: &sync.Mutex{}}
+
+	prds, err := store.FindAll()
+	assert.NoError(t, err)
+
+	assert.Len(t, prds, 1)
+	assert.Equal(t, "Fender", prds[0].Manufacturer)
+	assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
+}
+
 func TestProductStore_Upsert(t *testing.T) {
 	t.Run("save a new product", func(t *testing.T) {
 		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}

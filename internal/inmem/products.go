@@ -19,6 +19,18 @@ func NewProductStore() *ProductStore {
 	}
 }
 
+func (p *ProductStore) FindAll() ([]products.Product, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	prds := make([]products.Product, 0, len(p.products))
+
+	for _, v := range p.products {
+		prds = append(prds, v)
+	}
+	return prds, nil
+}
+
 func (p *ProductStore) Upsert(products []products.Product) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()

@@ -152,6 +152,7 @@ func TestLoadProducts(t *testing.T) {
 }
 
 type testProductStore struct {
+	products.Store
 	Products []products.Product
 }
 

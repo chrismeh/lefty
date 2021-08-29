@@ -3,6 +3,7 @@ package products
 import "time"
 
 type Store interface {
+	FindAll() ([]Product, error)
 	Upsert(products []Product) error
 }
 
