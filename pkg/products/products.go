@@ -1,5 +1,7 @@
 package products
 
+import "time"
+
 type Store interface {
 	Upsert(products []Product) error
 }
@@ -14,4 +16,6 @@ type Product struct {
 	Price            float64
 	ProductURL       string
 	ThumbnailURL     string
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
