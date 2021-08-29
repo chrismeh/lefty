@@ -4,16 +4,13 @@ import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chrismeh/lefty/pkg/products"
-	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 type MusikProduktiv struct {
-	http interface {
-		Get(url string) (*http.Response, error)
-	}
+	http          httpGetter
 	manufacturers []string
 }
 

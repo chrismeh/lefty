@@ -1,6 +1,9 @@
 package retailer
 
-import "github.com/chrismeh/lefty/pkg/products"
+import (
+	"github.com/chrismeh/lefty/pkg/products"
+	"net/http"
+)
 
 type Retailer interface {
 	LoadProducts(category string, options RequestOptions) (ProductResponse, error)
@@ -68,4 +71,8 @@ type ProductResponse struct {
 	Products    []products.Product
 	CurrentPage uint
 	LastPage    uint
+}
+
+type httpGetter interface {
+	Get(url string) (*http.Response, error)
 }

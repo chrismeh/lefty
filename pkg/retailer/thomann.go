@@ -5,16 +5,13 @@ import (
 	"fmt"
 	"github.com/chrismeh/lefty/pkg/products"
 	"io/ioutil"
-	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 type Thomann struct {
-	http interface {
-		Get(url string) (*http.Response, error)
-	}
+	http httpGetter
 }
 
 func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductResponse, error) {
