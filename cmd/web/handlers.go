@@ -26,7 +26,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	count := a.productStore.Count()
+	count := a.productStore.Count(filter)
 	lastPage := math.Ceil(float64(count) / float64(filter.ProductsPerPage))
 
 	resp := response{

@@ -45,11 +45,18 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 	return paginate(prds, f), nil
 }
 
-func (p *ProductStore) Count() int {
+func (p *ProductStore) Count(f products.Filter) int {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	return len(p.products)
+	var count int
+	for _, v := range p.products {
+		if f.Search == "" || strings.Contains(v.String(), f.Search) {
+			count++
+		}
+	}
+
+	return count
 }
 
 func (p *ProductStore) Upsert(products []products.Product) error {

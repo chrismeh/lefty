@@ -9,11 +9,27 @@ import (
 )
 
 func TestProductStore_Count(t *testing.T) {
-	p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
-	store := ProductStore{products: map[string]products.Product{"foo": p}, mu: &sync.Mutex{}}
+	t.Run("return number of products", func(t *testing.T) {
+		productMap := map[string]products.Product{
+			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
+			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
+		}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-	count := store.Count()
-	assert.Equal(t, 1, count)
+		count := store.Count(products.Filter{})
+		assert.Equal(t, 2, count)
+	})
+
+	t.Run("return number of products that match the filter criteria", func(t *testing.T) {
+		productMap := map[string]products.Product{
+			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
+			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
+		}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		count := store.Count(products.Filter{Search: "Fender"})
+		assert.Equal(t, 1, count)
+	})
 }
 
 func TestProductStore_FindAll(t *testing.T) {
