@@ -98,6 +98,20 @@ func TestProductStore_FindAll(t *testing.T) {
 		assert.Len(t, prds, 1)
 		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
 	})
+
+	t.Run("return only products that match the filter criteria", func(t *testing.T) {
+		productMap := map[string]products.Product{
+			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
+			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
+		}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		prds, err := store.FindAll(products.Filter{Search: "SG"})
+		assert.NoError(t, err)
+
+		assert.Len(t, prds, 1)
+		assert.Equal(t, "SG Standard Alpine White LH", prds[0].Model)
+	})
 }
 
 func TestProductStore_Upsert(t *testing.T) {

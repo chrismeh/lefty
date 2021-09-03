@@ -7,6 +7,7 @@ import (
 	"io"
 	"math"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 )
@@ -29,7 +30,12 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 
 	prds := make([]products.Product, 0, len(p.products))
 	for _, v := range p.products {
-		prds = append(prds, v)
+		if f.Search == "" || strings.Contains(v.Model, f.Search) {
+			prds = append(prds, v)
+		}
+	}
+	if len(prds) == 0 {
+		return prds, nil
 	}
 
 	sort.Slice(prds, func(i, j int) bool {

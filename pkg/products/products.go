@@ -19,6 +19,7 @@ type Product struct {
 }
 
 type Filter struct {
+	Search          string
 	Page            uint
 	ProductsPerPage uint
 }
