@@ -47,6 +47,49 @@ func TestProductStore_FindAll(t *testing.T) {
 		assert.Len(t, prds, 1)
 		assert.Equal(t, float64(1819), prds[0].Price)
 	})
+
+	t.Run("apply default pagination settings when pagination data is invalid", func(t *testing.T) {
+		productMap := map[string]products.Product{
+			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
+			"bar": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394},
+		}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		tests := []struct {
+			Name            string
+			Page            uint
+			ProductsPerPage uint
+		}{
+			{Name: "products per page is larger than product count", Page: 1, ProductsPerPage: 50},
+			{Name: "page is zero", Page: 0, ProductsPerPage: 50},
+			{Name: "page does not exist", Page: 100, ProductsPerPage: 50},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.Name, func(t *testing.T) {
+				filter := products.Filter{Page: tt.Page, ProductsPerPage: tt.ProductsPerPage}
+				prds, err := store.FindAll(filter)
+				assert.NoError(t, err)
+
+				assert.Len(t, prds, 2)
+			})
+		}
+	})
+
+	t.Run("return slice of remaining products on the last page", func(t *testing.T) {
+		productMap := map[string]products.Product{
+			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
+			"bar": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394},
+			"baz": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH 3TSB", Price: 1799},
+		}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		prds, err := store.FindAll(products.Filter{Page: 2, ProductsPerPage: 2})
+		assert.NoError(t, err)
+
+		assert.Len(t, prds, 1)
+		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
+	})
 }
 
 func TestProductStore_Upsert(t *testing.T) {

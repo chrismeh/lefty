@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/chrismeh/lefty/pkg/products"
 	"io"
+	"math"
 	"sort"
 	"sync"
 	"time"
@@ -71,18 +72,28 @@ func (p *ProductStore) Load(r io.Reader) error {
 }
 
 func paginate(prds []products.Product, f products.Filter) []products.Product {
+	count := uint(len(prds))
 	if f.Page == 0 {
 		f.Page = 1
 	}
 	if f.ProductsPerPage == 0 {
 		f.ProductsPerPage = 50
 	}
-	if f.ProductsPerPage > uint(len(prds)) {
-		f.ProductsPerPage = uint(len(prds))
+	if f.ProductsPerPage > count {
+		f.ProductsPerPage = count
 	}
 
+	lastPage := math.Ceil(float64(count) / float64(f.ProductsPerPage))
+	if f.Page > uint(lastPage) {
+		f.Page = 1
+	}
+
+	offset := (f.Page - 1) * f.ProductsPerPage
 	limit := f.ProductsPerPage
-	offset := (f.Page - 1) * limit
+
+	if offset+limit > count {
+		limit = count - offset
+	}
 
 	return prds[offset : offset+limit]
 }
