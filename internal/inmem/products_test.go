@@ -137,6 +137,11 @@ func TestProductStore_FindAll(t *testing.T) {
 				Search:        "Fender",
 				ExpectedModel: "AM Pro II Jazzmaster LH MN MYS",
 			},
+			{
+				Name:          "find product by model, case insensitive",
+				Search:        "sg",
+				ExpectedModel: "SG Standard Alpine White LH",
+			},
 		}
 
 		for _, tt := range tests {

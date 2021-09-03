@@ -30,7 +30,7 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 
 	prds := make([]products.Product, 0, len(p.products))
 	for _, v := range p.products {
-		if f.Search == "" || strings.Contains(v.String(), f.Search) {
+		if f.Search == "" || productMatchesFilter(v, f) {
 			prds = append(prds, v)
 		}
 	}
@@ -51,7 +51,7 @@ func (p *ProductStore) Count(f products.Filter) int {
 
 	var count int
 	for _, v := range p.products {
-		if f.Search == "" || strings.Contains(v.String(), f.Search) {
+		if f.Search == "" || productMatchesFilter(v, f) {
 			count++
 		}
 	}
@@ -88,6 +88,13 @@ func (p *ProductStore) Load(r io.Reader) error {
 	defer p.mu.Unlock()
 
 	return json.NewDecoder(r).Decode(&p.products)
+}
+
+func productMatchesFilter(p products.Product, f products.Filter) bool {
+	name := strings.ToLower(p.String())
+	search := strings.ToLower(f.Search)
+
+	return strings.Contains(name, search)
 }
 
 func paginate(prds []products.Product, f products.Filter) []products.Product {
