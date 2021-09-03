@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+func TestProductStore_Count(t *testing.T) {
+	p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+	store := ProductStore{products: map[string]products.Product{"foo": p}, mu: &sync.Mutex{}}
+
+	count := store.Count()
+	assert.Equal(t, 1, count)
+}
+
 func TestProductStore_FindAll(t *testing.T) {
 	t.Run("return a slice of products", func(t *testing.T) {
 		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}

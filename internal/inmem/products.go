@@ -28,7 +28,6 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 	defer p.mu.Unlock()
 
 	prds := make([]products.Product, 0, len(p.products))
-
 	for _, v := range p.products {
 		prds = append(prds, v)
 	}
@@ -38,6 +37,13 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 	})
 
 	return paginate(prds, f), nil
+}
+
+func (p *ProductStore) Count() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return len(p.products)
 }
 
 func (p *ProductStore) Upsert(products []products.Product) error {
