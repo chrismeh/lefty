@@ -5,7 +5,7 @@ import (
 )
 
 type Store interface {
-	FindAll() ([]Product, error)
+	FindAll(filter Filter) ([]Product, error)
 	Upsert(products []Product) error
 }
 
@@ -21,4 +21,9 @@ type Product struct {
 	ThumbnailURL     string
 	CreatedAt        time.Time
 	UpdatedAt        time.Time
+}
+
+type Filter struct {
+	Page            uint
+	ProductsPerPage uint
 }

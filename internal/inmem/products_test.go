@@ -13,7 +13,7 @@ func TestProductStore_FindAll(t *testing.T) {
 		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
 		store := ProductStore{products: map[string]products.Product{"foo": p}, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll()
+		prds, err := store.FindAll(products.Filter{})
 		assert.NoError(t, err)
 
 		assert.Len(t, prds, 1)
@@ -21,17 +21,31 @@ func TestProductStore_FindAll(t *testing.T) {
 		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
 	})
 
-	t.Run("should sort by price ascending by default", func(t *testing.T) {
+	t.Run("sort by price ascending by default", func(t *testing.T) {
 		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
 		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
 		productMap := map[string]products.Product{"foo": p1, "bar": p2}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll()
+		prds, err := store.FindAll(products.Filter{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, float64(394), prds[0].Price)
 		assert.Equal(t, float64(1819), prds[1].Price)
+	})
+
+	t.Run("return a paginated slice of products", func(t *testing.T) {
+		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		productMap := map[string]products.Product{"foo": p1, "bar": p2}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		filter := products.Filter{Page: 2, ProductsPerPage: 1}
+		prds, err := store.FindAll(filter)
+		assert.NoError(t, err)
+
+		assert.Len(t, prds, 1)
+		assert.Equal(t, float64(1819), prds[0].Price)
 	})
 }
 

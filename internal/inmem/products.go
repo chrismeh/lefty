@@ -22,7 +22,7 @@ func NewProductStore() *ProductStore {
 	}
 }
 
-func (p *ProductStore) FindAll() ([]products.Product, error) {
+func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -35,7 +35,8 @@ func (p *ProductStore) FindAll() ([]products.Product, error) {
 	sort.Slice(prds, func(i, j int) bool {
 		return prds[i].Price < prds[j].Price
 	})
-	return prds, nil
+
+	return paginate(prds, f), nil
 }
 
 func (p *ProductStore) Upsert(products []products.Product) error {
@@ -67,6 +68,23 @@ func (p *ProductStore) Load(r io.Reader) error {
 	defer p.mu.Unlock()
 
 	return json.NewDecoder(r).Decode(&p.products)
+}
+
+func paginate(prds []products.Product, f products.Filter) []products.Product {
+	if f.Page == 0 {
+		f.Page = 1
+	}
+	if f.ProductsPerPage == 0 {
+		f.ProductsPerPage = 50
+	}
+	if f.ProductsPerPage > uint(len(prds)) {
+		f.ProductsPerPage = uint(len(prds))
+	}
+
+	limit := f.ProductsPerPage
+	offset := (f.Page - 1) * limit
+
+	return prds[offset : offset+limit]
 }
 
 func buildProductKey(p products.Product) string {

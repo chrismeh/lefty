@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/chrismeh/lefty/pkg/products"
 	"net/http"
 )
 
@@ -10,7 +11,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prds, err := a.productStore.FindAll()
+	prds, err := a.productStore.FindAll(products.Filter{})
 	if err != nil {
 		a.jsonError(w, "Internal server jsonError", http.StatusInternalServerError)
 		return
