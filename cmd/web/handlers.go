@@ -13,7 +13,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filter := products.Filter{Page: 1, ProductsPerPage: 50}
+	filter := products.Filter{Page: 1, ProductsPerPage: 50, Search: r.URL.Query().Get("search")}
 	if page := r.URL.Query().Get("page"); page != "" {
 		if p, err := strconv.Atoi(page); err == nil {
 			filter.Page = uint(p)
