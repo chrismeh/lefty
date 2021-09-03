@@ -106,11 +106,32 @@ func TestProductStore_FindAll(t *testing.T) {
 		}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll(products.Filter{Search: "SG"})
-		assert.NoError(t, err)
+		tests := []struct {
+			Name          string
+			Search        string
+			ExpectedModel string
+		}{
+			{
+				Name:          "find product by model",
+				Search:        "SG",
+				ExpectedModel: "SG Standard Alpine White LH",
+			},
+			{
+				Name:          "find product by manufacturer",
+				Search:        "Fender",
+				ExpectedModel: "AM Pro II Jazzmaster LH MN MYS",
+			},
+		}
 
-		assert.Len(t, prds, 1)
-		assert.Equal(t, "SG Standard Alpine White LH", prds[0].Model)
+		for _, tt := range tests {
+			t.Run(tt.Name, func(t *testing.T) {
+				prds, err := store.FindAll(products.Filter{Search: tt.Search})
+				assert.NoError(t, err)
+
+				assert.Len(t, prds, 1)
+				assert.Equal(t, tt.ExpectedModel, prds[0].Model)
+			})
+		}
 	})
 }
 

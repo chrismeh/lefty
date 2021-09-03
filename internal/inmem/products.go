@@ -30,7 +30,7 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 
 	prds := make([]products.Product, 0, len(p.products))
 	for _, v := range p.products {
-		if f.Search == "" || strings.Contains(v.Model, f.Search) {
+		if f.Search == "" || strings.Contains(v.String(), f.Search) {
 			prds = append(prds, v)
 		}
 	}

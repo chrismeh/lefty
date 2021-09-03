@@ -1,6 +1,7 @@
 package products
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -16,6 +17,10 @@ type Product struct {
 	ThumbnailURL     string    `json:"thumbnail_url"`
 	CreatedAt        time.Time `json:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at"`
+}
+
+func (p Product) String() string {
+	return fmt.Sprintf("%s %s", p.Manufacturer, p.Model)
 }
 
 type Filter struct {
