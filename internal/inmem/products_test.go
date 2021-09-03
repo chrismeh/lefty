@@ -9,15 +9,30 @@ import (
 )
 
 func TestProductStore_FindAll(t *testing.T) {
-	p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
-	store := ProductStore{products: map[string]products.Product{buildProductKey(p): p}, mu: &sync.Mutex{}}
+	t.Run("return a slice of products", func(t *testing.T) {
+		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+		store := ProductStore{products: map[string]products.Product{buildProductKey(p): p}, mu: &sync.Mutex{}}
 
-	prds, err := store.FindAll()
-	assert.NoError(t, err)
+		prds, err := store.FindAll()
+		assert.NoError(t, err)
 
-	assert.Len(t, prds, 1)
-	assert.Equal(t, "Fender", prds[0].Manufacturer)
-	assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
+		assert.Len(t, prds, 1)
+		assert.Equal(t, "Fender", prds[0].Manufacturer)
+		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
+	})
+
+	t.Run("should sort by price ascending by default", func(t *testing.T) {
+		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		productMap := map[string]products.Product{buildProductKey(p1): p1, buildProductKey(p2): p2}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		prds, err := store.FindAll()
+		assert.NoError(t, err)
+
+		assert.Equal(t, float64(394), prds[0].Price)
+		assert.Equal(t, float64(1819), prds[1].Price)
+	})
 }
 
 func TestProductStore_Upsert(t *testing.T) {

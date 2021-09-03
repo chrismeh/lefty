@@ -3,6 +3,7 @@ package inmem
 import (
 	"fmt"
 	"github.com/chrismeh/lefty/pkg/products"
+	"sort"
 	"sync"
 	"time"
 )
@@ -28,6 +29,10 @@ func (p *ProductStore) FindAll() ([]products.Product, error) {
 	for _, v := range p.products {
 		prds = append(prds, v)
 	}
+
+	sort.Slice(prds, func(i, j int) bool {
+		return prds[i].Price < prds[j].Price
+	})
 	return prds, nil
 }
 
