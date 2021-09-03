@@ -4,12 +4,6 @@ import (
 	"time"
 )
 
-type Store interface {
-	FindAll(filter Filter) ([]Product, error)
-	Count() int
-	Upsert(products []Product) error
-}
-
 type Product struct {
 	Retailer         string    `json:"retailer"`
 	Manufacturer     string    `json:"manufacturer"`

@@ -10,7 +10,11 @@ type Retailer interface {
 	Categories() []string
 }
 
-func UpdateRetailers(ps products.Store, retailer ...Retailer) error {
+type ProductUpserter interface {
+	Upsert([]products.Product) error
+}
+
+func UpdateRetailers(ps ProductUpserter, retailer ...Retailer) error {
 	prds := make([]products.Product, 0)
 
 	for _, r := range retailer {

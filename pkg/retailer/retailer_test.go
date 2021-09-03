@@ -152,7 +152,7 @@ func TestLoadProducts(t *testing.T) {
 }
 
 type testProductStore struct {
-	products.Store
+	ProductUpserter
 	Products []products.Product
 }
 
