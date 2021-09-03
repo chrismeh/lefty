@@ -2,9 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"github.com/chrismeh/lefty/internal/inmem"
-	"github.com/chrismeh/lefty/pkg/products"
 	"github.com/chrismeh/lefty/pkg/retailer"
 	"log"
 	"net/http"
@@ -15,7 +15,7 @@ import (
 type application struct {
 	infoLog      *log.Logger
 	errorLog     *log.Logger
-	productStore products.Store
+	productStore *inmem.ProductStore
 }
 
 func main() {
@@ -61,15 +61,35 @@ func (a application) jsonError(w http.ResponseWriter, error string, code int) {
 }
 
 func (a application) updateRetailers() {
+	f, err := os.Open("products.json")
+	if err == nil {
+		a.infoLog.Println("Skipped retailer update: products.json found")
+		_ = a.productStore.Load(f)
+		f.Close()
+		return
+	}
+	if !errors.Is(err, os.ErrNotExist) {
+		panic(err)
+	}
+	defer f.Close()
+
 	start := time.Now()
 	a.infoLog.Println("Starting retailer update ...")
 
 	c := http.Client{Timeout: 5 * time.Second}
-	err := retailer.UpdateRetailers(a.productStore, retailer.NewThomann(&c), retailer.NewMusikProduktiv(&c))
+	err = retailer.UpdateRetailers(a.productStore, retailer.NewThomann(&c), retailer.NewMusikProduktiv(&c))
 	if err != nil {
 		a.errorLog.Println(err)
 	}
 
 	duration := time.Since(start)
 	a.infoLog.Printf("Finished retailer update after %d ms", duration.Milliseconds())
+
+	f, err = os.Create("products.json")
+	if err != nil {
+		panic(err)
+	}
+
+	_ = a.productStore.Dump(f)
+	f.Close()
 }
