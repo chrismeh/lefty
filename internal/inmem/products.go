@@ -1,8 +1,10 @@
 package inmem
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/chrismeh/lefty/pkg/products"
+	"io"
 	"sort"
 	"sync"
 	"time"
@@ -51,6 +53,20 @@ func (p *ProductStore) Upsert(products []products.Product) error {
 	}
 
 	return nil
+}
+
+func (p *ProductStore) Dump(w io.Writer) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return json.NewEncoder(w).Encode(p.products)
+}
+
+func (p *ProductStore) Load(r io.Reader) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	return json.NewDecoder(r).Decode(&p.products)
 }
 
 func buildProductKey(p products.Product) string {

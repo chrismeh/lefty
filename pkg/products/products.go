@@ -1,6 +1,8 @@
 package products
 
-import "time"
+import (
+	"time"
+)
 
 type Store interface {
 	FindAll() ([]Product, error)
