@@ -6,6 +6,7 @@ import (
 
 type Store interface {
 	FindAll(filter Filter) ([]Product, error)
+	Count() int
 	Upsert(products []Product) error
 }
 
