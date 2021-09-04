@@ -7,6 +7,8 @@ import (
 
 const (
 	OrderPriceDesc          string = "-price"
+	OrderByAvailabilityAsc         = "availability"
+	OrderByAvailabilityDesc        = "-availability"
 	AvailabilityAvailable   int    = 1
 	AvailabilityWithinDays         = 2
 	AvailabilityWithinWeeks        = 3

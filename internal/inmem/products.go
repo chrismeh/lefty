@@ -42,6 +42,10 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 		switch f.OrderBy {
 		case products.OrderPriceDesc:
 			return prds[i].Price > prds[j].Price
+		case products.OrderByAvailabilityAsc:
+			return prds[i].AvailabilityScore < prds[j].AvailabilityScore
+		case products.OrderByAvailabilityDesc:
+			return prds[i].AvailabilityScore > prds[j].AvailabilityScore
 		default:
 			return prds[i].Price < prds[j].Price
 		}

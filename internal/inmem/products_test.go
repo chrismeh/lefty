@@ -193,6 +193,33 @@ func TestProductStore_FindAll(t *testing.T) {
 		assert.Equal(t, float64(1819), prds[0].Price)
 		assert.Equal(t, float64(394), prds[1].Price)
 	})
+
+	t.Run("allow sorting by availability", func(t *testing.T) {
+		productMap := map[string]products.Product{
+			"foo": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394, AvailabilityScore: 2},
+			"bar": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819, AvailabilityScore: 1},
+			"baz": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449, AvailabilityScore: 3},
+		}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		tests := []struct {
+			Name          string
+			Order         string
+			ExpectedModel string
+		}{
+			{Name: "availability asc", Order: "availability", ExpectedModel: "AM Pro II Jazzmaster LH MN MYS"},
+			{Name: "availability desc", Order: "-availability", ExpectedModel: "SG Standard Alpine White LH"},
+		}
+
+		for _, tt := range tests {
+			t.Run(tt.Name, func(t *testing.T) {
+				prds, err := store.FindAll(products.Filter{OrderBy: tt.Order})
+				assert.NoError(t, err)
+
+				assert.Equal(t, tt.ExpectedModel, prds[0].Model)
+			})
+		}
+	})
 }
 
 func TestProductStore_Upsert(t *testing.T) {
