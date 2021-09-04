@@ -6,7 +6,11 @@ import (
 )
 
 const (
-	OrderPriceDesc string = "-price"
+	OrderPriceDesc          string = "-price"
+	AvailabilityAvailable   int    = 1
+	AvailabilityWithinDays         = 2
+	AvailabilityWithinWeeks        = 3
+	AvailabilityUnknown            = 4
 )
 
 type Product struct {
