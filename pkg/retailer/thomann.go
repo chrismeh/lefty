@@ -96,15 +96,16 @@ func (p page) products() []products.Product {
 		}
 
 		pr[k] = products.Product{
-			Retailer:         "Thomann",
-			Manufacturer:     v.Manufacturer,
-			Model:            v.Model,
-			Category:         p.Title,
-			IsAvailable:      v.Availability.IsAvailable,
-			AvailabilityInfo: v.Availability.Text,
-			Price:            price,
-			ProductURL:       v.Link,
-			ThumbnailURL:     thumbnailURL,
+			Retailer:          "Thomann",
+			Manufacturer:      v.Manufacturer,
+			Model:             v.Model,
+			Category:          p.Title,
+			IsAvailable:       v.Availability.IsAvailable,
+			AvailabilityInfo:  v.Availability.Text,
+			AvailabilityScore: v.Availability.Status,
+			Price:             price,
+			ProductURL:        v.Link,
+			ThumbnailURL:      thumbnailURL,
 		}
 	}
 
@@ -125,6 +126,7 @@ type article struct {
 }
 
 type availability struct {
+	Status      int    `json:"status"`
 	IsAvailable bool   `json:"isAvailable"`
 	Text        string `json:"text"`
 }
