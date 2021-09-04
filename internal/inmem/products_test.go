@@ -9,7 +9,11 @@ import (
 )
 
 func TestProductStore_Count(t *testing.T) {
+	t.Parallel()
+
 	t.Run("return number of products", func(t *testing.T) {
+		t.Parallel()
+
 		productMap := map[string]products.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
@@ -21,6 +25,8 @@ func TestProductStore_Count(t *testing.T) {
 	})
 
 	t.Run("return number of products that match the filter criteria", func(t *testing.T) {
+		t.Parallel()
+
 		productMap := map[string]products.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
@@ -33,7 +39,11 @@ func TestProductStore_Count(t *testing.T) {
 }
 
 func TestProductStore_FindAll(t *testing.T) {
+	t.Parallel()
+
 	t.Run("return a slice of products", func(t *testing.T) {
+		t.Parallel()
+
 		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
 		store := ProductStore{products: map[string]products.Product{"foo": p}, mu: &sync.Mutex{}}
 
@@ -46,6 +56,8 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("return a paginated slice of products", func(t *testing.T) {
+		t.Parallel()
+
 		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
 		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
 		productMap := map[string]products.Product{"foo": p1, "bar": p2}
@@ -60,6 +72,8 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("apply default pagination settings when pagination data is invalid", func(t *testing.T) {
+		t.Parallel()
+
 		productMap := map[string]products.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394},
@@ -78,6 +92,8 @@ func TestProductStore_FindAll(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.Name, func(t *testing.T) {
+				t.Parallel()
+
 				filter := products.Filter{Page: tt.Page, ProductsPerPage: tt.ProductsPerPage}
 				prds, err := store.FindAll(filter)
 				assert.NoError(t, err)
@@ -88,6 +104,8 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("return slice of remaining products on the last page", func(t *testing.T) {
+		t.Parallel()
+
 		productMap := map[string]products.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394},
@@ -103,6 +121,8 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("return only products that match the filter criteria", func(t *testing.T) {
+		t.Parallel()
+
 		productMap := map[string]products.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
@@ -133,6 +153,8 @@ func TestProductStore_FindAll(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.Name, func(t *testing.T) {
+				t.Parallel()
+
 				prds, err := store.FindAll(products.Filter{Search: tt.Search})
 				assert.NoError(t, err)
 
@@ -143,6 +165,8 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("sort by price ascending by default", func(t *testing.T) {
+		t.Parallel()
+
 		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
 		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
 		productMap := map[string]products.Product{"foo": p1, "bar": p2}
@@ -156,6 +180,8 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("allow sorting by price descending", func(t *testing.T) {
+		t.Parallel()
+
 		p1 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
 		p2 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
 		productMap := map[string]products.Product{"foo": p1, "bar": p2}
@@ -170,7 +196,11 @@ func TestProductStore_FindAll(t *testing.T) {
 }
 
 func TestProductStore_Upsert(t *testing.T) {
+	t.Parallel()
+
 	t.Run("save a new product", func(t *testing.T) {
+		t.Parallel()
+
 		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
 		store := NewProductStore()
 
@@ -185,6 +215,8 @@ func TestProductStore_Upsert(t *testing.T) {
 	})
 
 	t.Run("set timestamps when saving a new product", func(t *testing.T) {
+		t.Parallel()
+
 		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
 		store := NewProductStore()
 
@@ -197,6 +229,8 @@ func TestProductStore_Upsert(t *testing.T) {
 	})
 
 	t.Run("setUpdatedAt timestamp when saving an existing product", func(t *testing.T) {
+		t.Parallel()
+
 		p := products.Product{
 			Manufacturer: "Fender",
 			Model:        "AM Pro II Jazzmaster LH MN MYS",
