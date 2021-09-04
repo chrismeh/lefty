@@ -2,6 +2,7 @@ package retailer
 
 import (
 	"bytes"
+	"github.com/chrismeh/lefty/pkg/products"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -117,6 +118,26 @@ func TestThomann_LoadProducts(t *testing.T) {
 
 		assert.Error(t, err)
 	})
+}
+
+func TestAvailability_Score(t *testing.T) {
+	tests := []struct {
+		Name          string
+		Status        int
+		ExpectedScore int
+	}{
+		{Name: "product available", Status: 1, ExpectedScore: products.AvailabilityAvailable},
+		{Name: "product available in days", Status: 2, ExpectedScore: products.AvailabilityWithinDays},
+		{Name: "product available in weeks", Status: 4, ExpectedScore: products.AvailabilityWithinWeeks},
+		{Name: "product availability unknown", Status: 1337, ExpectedScore: products.AvailabilityUnknown},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			av := availability{Status: tt.Status}
+			assert.Equal(t, tt.ExpectedScore, av.Score())
+		})
+	}
 }
 
 type testHTTPClient struct {

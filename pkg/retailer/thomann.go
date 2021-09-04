@@ -102,7 +102,7 @@ func (p page) products() []products.Product {
 			Category:          p.Title,
 			IsAvailable:       v.Availability.IsAvailable,
 			AvailabilityInfo:  v.Availability.Text,
-			AvailabilityScore: v.Availability.Status,
+			AvailabilityScore: v.Availability.Score(),
 			Price:             price,
 			ProductURL:        v.Link,
 			ThumbnailURL:      thumbnailURL,
@@ -129,6 +129,19 @@ type availability struct {
 	Status      int    `json:"status"`
 	IsAvailable bool   `json:"isAvailable"`
 	Text        string `json:"text"`
+}
+
+func (a availability) Score() int {
+	switch a.Status {
+	case 1:
+		return products.AvailabilityAvailable
+	case 2:
+		return products.AvailabilityWithinDays
+	case 4:
+		return products.AvailabilityWithinWeeks
+	default:
+		return products.AvailabilityUnknown
+	}
 }
 
 type price struct {
