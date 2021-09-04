@@ -45,19 +45,6 @@ func TestProductStore_FindAll(t *testing.T) {
 		assert.Equal(t, "AM Pro II Jazzmaster LH MN MYS", prds[0].Model)
 	})
 
-	t.Run("sort by price ascending by default", func(t *testing.T) {
-		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
-		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
-		productMap := map[string]products.Product{"foo": p1, "bar": p2}
-		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
-
-		prds, err := store.FindAll(products.Filter{})
-		assert.NoError(t, err)
-
-		assert.Equal(t, float64(394), prds[0].Price)
-		assert.Equal(t, float64(1819), prds[1].Price)
-	})
-
 	t.Run("return a paginated slice of products", func(t *testing.T) {
 		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
 		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
@@ -153,6 +140,32 @@ func TestProductStore_FindAll(t *testing.T) {
 				assert.Equal(t, tt.ExpectedModel, prds[0].Model)
 			})
 		}
+	})
+
+	t.Run("sort by price ascending by default", func(t *testing.T) {
+		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		productMap := map[string]products.Product{"foo": p1, "bar": p2}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		prds, err := store.FindAll(products.Filter{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, float64(394), prds[0].Price)
+		assert.Equal(t, float64(1819), prds[1].Price)
+	})
+
+	t.Run("allow sorting by price descending", func(t *testing.T) {
+		p1 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		p2 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		productMap := map[string]products.Product{"foo": p1, "bar": p2}
+		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
+
+		prds, err := store.FindAll(products.Filter{OrderBy: products.OrderPriceDesc})
+		assert.NoError(t, err)
+
+		assert.Equal(t, float64(1819), prds[0].Price)
+		assert.Equal(t, float64(394), prds[1].Price)
 	})
 }
 

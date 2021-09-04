@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	OrderPriceDesc string = "-price"
+)
+
 type Product struct {
 	Retailer         string    `json:"retailer"`
 	Manufacturer     string    `json:"manufacturer"`
@@ -25,6 +29,7 @@ func (p Product) String() string {
 
 type Filter struct {
 	Search          string
+	OrderBy         string
 	Page            uint
 	ProductsPerPage uint
 }

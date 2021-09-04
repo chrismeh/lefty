@@ -39,7 +39,12 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 	}
 
 	sort.Slice(prds, func(i, j int) bool {
-		return prds[i].Price < prds[j].Price
+		switch f.OrderBy {
+		case products.OrderPriceDesc:
+			return prds[i].Price > prds[j].Price
+		default:
+			return prds[i].Price < prds[j].Price
+		}
 	})
 
 	return paginate(prds, f), nil
