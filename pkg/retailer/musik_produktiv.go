@@ -92,13 +92,14 @@ func (m *MusikProduktiv) parseProduct(s *goquery.Selection) (products.Product, e
 	}
 
 	return products.Product{
-		Retailer:     "Musik Produktiv",
-		Manufacturer: manufacturer,
-		Model:        model,
-		Price:        price,
-		IsAvailable:  !s.Find(".ampel").HasClass("zzz"),
-		ProductURL:   s.Find("a").First().AttrOr("href", ""),
-		ThumbnailURL: s.Find("img").First().AttrOr("src", ""),
+		Retailer:          "Musik Produktiv",
+		Manufacturer:      manufacturer,
+		Model:             model,
+		Price:             price,
+		IsAvailable:       !s.Find(".ampel").HasClass("zzz"),
+		AvailabilityScore: m.parseAvailabilityScore(s),
+		ProductURL:        s.Find("a").First().AttrOr("href", ""),
+		ThumbnailURL:      s.Find("img").First().AttrOr("src", ""),
 	}, nil
 }
 
@@ -123,6 +124,21 @@ func (m *MusikProduktiv) parsePrice(price string) (float64, error) {
 	}
 
 	return fPrice, nil
+}
+
+func (m *MusikProduktiv) parseAvailabilityScore(s *goquery.Selection) int {
+	s = s.Find(".ampel")
+	if s.HasClass("ggg") {
+		return products.AvailabilityAvailable
+	}
+	if s.HasClass("ggy") {
+		return products.AvailabilityWithinDays
+	}
+	if s.HasClass("gyy") {
+		return products.AvailabilityWithinWeeks
+	}
+
+	return products.AvailabilityUnknown
 }
 
 func (m *MusikProduktiv) parsePagination(s *goquery.Document) (currentPage, lastPage int, err error) {
