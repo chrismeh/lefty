@@ -30,7 +30,7 @@ func (t Thomann) LoadProducts(category string, options RequestOptions) (ProductR
 		return ProductResponse{}, fmt.Errorf("could not read response body from thomann.de: %w", err)
 	}
 
-	re := regexp.MustCompile(`(?ms)({"headline":.+?"})], {"general`)
+	re := regexp.MustCompile(`(?ms)({"headline":.+?"})\);`)
 	match := re.FindStringSubmatch(string(body))
 	if len(match) < 2 {
 		return ProductResponse{}, fmt.Errorf("unexpected response body structure")
@@ -90,10 +90,8 @@ func (p page) products() []products.Product {
 			price = 0.00
 		}
 
-		var thumbnailURL string
-		if v.Image.Exists {
-			thumbnailURL = fmt.Sprintf("https://thumbs.static-thomann.de/thumb/thumb220x220/pics/prod/%s", v.Image.Name)
-		}
+		productURL := fmt.Sprintf("https://www.thomann.de/de/%s", v.Link)
+		thumbnailURL := fmt.Sprintf("https://thumbs.static-thomann.de/thumb/thumb220x220/pics/prod/%s", v.Image.Name)
 
 		pr[k] = products.Product{
 			Retailer:          "Thomann",
@@ -104,7 +102,7 @@ func (p page) products() []products.Product {
 			AvailabilityInfo:  v.Availability.Text,
 			AvailabilityScore: v.Availability.Score(),
 			Price:             price,
-			ProductURL:        v.Link,
+			ProductURL:        productURL,
 			ThumbnailURL:      thumbnailURL,
 		}
 	}
@@ -118,17 +116,17 @@ type articleList struct {
 
 type article struct {
 	Manufacturer string       `json:"manufacturer"`
-	Model        string       `json:"name"`
+	Model        string       `json:"model"`
 	Availability availability `json:"availability"`
 	Price        price        `json:"price"`
-	Link         string       `json:"link"`
-	Image        image        `json:"image"`
+	Link         string       `json:"relativeLink"`
+	Image        image        `json:"mainImage"`
 }
 
 type availability struct {
-	Status      int    `json:"status"`
+	Status      int    `json:"code"`
 	IsAvailable bool   `json:"isAvailable"`
-	Text        string `json:"text"`
+	Text        string `json:"textShort"`
 }
 
 func (a availability) Score() int {
@@ -149,12 +147,11 @@ type price struct {
 }
 
 type priceEntry struct {
-	Raw string `json:"raw"`
+	Raw string `json:"rawPrice"`
 }
 
 type image struct {
-	Name   string `json:"fname"`
-	Exists bool   `json:"exists"`
+	Name string `json:"fileName"`
 }
 
 type pagination struct {
