@@ -27,7 +27,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 
 	prds, err := a.productStore.FindAll(filter)
 	if err != nil {
-		a.jsonError(w, "Internal server jsonError", http.StatusInternalServerError)
+		a.jsonError(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -45,7 +45,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	err = a.json(w, resp)
 	if err != nil {
-		a.jsonError(w, "Internal server jsonError", http.StatusInternalServerError)
+		a.jsonError(w, "Internal server error", http.StatusInternalServerError)
 		return
 	}
 }
