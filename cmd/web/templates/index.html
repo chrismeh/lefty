@@ -22,26 +22,35 @@
     <section class="section">
         <div class="container">
             <div id="app">
-                <h4 class="is-4 title heading">Guitars and basses</h4>
-                <div class="card my-5" v-for="product in products">
-                    <div class="card-content">
-                        <div class="columns">
-                            <div class="column is-1 has-text-centered-mobile">
-                                <img :src="product.thumbnail_url" :alt="product.manufacturer + ' ' + product.model">
-                            </div>
-                            <div class="column is-5 has-text-centered-mobile">
-                                <div>
-                                    <strong>{{ product.manufacturer }} {{ product.model }}</strong>
+                <div v-if="products.length === 0" class="has-text-centered">
+                    <img src="/static/happy_music.svg" alt="" style="width: 30%;">
+                    <p class="my-5">
+                        Sorry, I couldn't find any products. Please wait until the update process is finished
+                        and reload the page.
+                    </p>
+                </div>
+                <div v-else>
+                    <h4 class="is-4 title heading">Guitars and basses</h4>
+                    <div class="card my-5" v-for="product in products">
+                        <div class="card-content">
+                            <div class="columns">
+                                <div class="column is-1 has-text-centered-mobile">
+                                    <img :src="product.thumbnail_url" :alt="product.manufacturer + ' ' + product.model">
                                 </div>
-                                <div>
-                                    {{ product.availability_info }}
+                                <div class="column is-5 has-text-centered-mobile">
+                                    <div>
+                                        <strong>{{ product.manufacturer }} {{ product.model }}</strong>
+                                    </div>
+                                    <div>
+                                        {{ product.availability_info }}
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="column has-text-centered-mobile has-text-right-tablet">
-                                <div>
-                                    <a :href="product.product_url" class="button is-link" target="_blank">
-                                        {{ product.price }} € @ {{ product.retailer }}
-                                    </a>
+                                <div class="column has-text-centered-mobile has-text-right-tablet">
+                                    <div>
+                                        <a :href="product.product_url" class="button is-link" target="_blank">
+                                            {{ product.price }} € @ {{ product.retailer }}
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
