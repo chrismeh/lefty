@@ -4,10 +4,12 @@
 
 $family-sans-serif: "Open Sans", sans-serif;
 
-$primary: #DCCCBB;
+$primary: #264653;
+$link: #2A9D8F;
 
 .navbar {
   font-weight: 700;
+  border-bottom: 4px solid $link;
 }
 
 @import "../node_modules/bulma/bulma";

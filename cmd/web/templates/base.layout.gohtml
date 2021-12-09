@@ -11,9 +11,14 @@
 </head>
 <body>
     {{template "nav" .}}
-    <div class="container py-6">
-        {{template "content" .}}
-    </div>
+    <section class="section">
+        <div class="container">
+            {{template "content" .}}
+        </div>
+    </section>
+
+    <script src="/static/vue.js"></script>
+    <script src="/static/lefty.js"></script>
 </body>
 </html>
 {{end}}
