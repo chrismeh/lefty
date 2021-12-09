@@ -25,13 +25,51 @@
             <div id="app">
                 <div v-if="products.length === 0" class="has-text-centered">
                     <img src="/static/happy_music.svg" alt="" style="width: 30%;">
-                    <p class="my-5">
+                    <p class="my-5" v-if="search === ''">
                         Sorry, I couldn't find any products. Please wait until the update process is finished
                         and reload the page.
                     </p>
+                    <div class="my-5" v-else>
+                        Sorry, your search didn't return any results.
+                        <div class="my-4">
+                            <button class="button is-link" @click="resetSearchTerm">Reset your search term</button>
+                        </div>
+                    </div>
                 </div>
                 <div v-else>
                     <h4 class="is-4 title heading">Guitars and basses</h4>
+                    <div class="columns">
+                        <div class="column is-6">
+                            <div class="field">
+                                <label class="label" for="search">Search term</label>
+                                <div class="control">
+                                    <input
+                                            id="search"
+                                            class="input is-rounded"
+                                            type="text"
+                                            placeholder="Fender Telecaster"
+                                            v-model="search"
+                                            @input="updateSearchTerm"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-6">
+                            <div class="field">
+                                <label class="label" for="order">Order</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select id="order" v-model="order" @change="fetchProducts">
+                                            <option value="price">Price, ascending</option>
+                                            <option value="-price">Price, descending</option>
+                                            <option value="availability">Availability, ascending</option>
+                                            <option value="-availability">Availability, descending</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card my-5" v-for="product in products">
                         <div class="card-content">
                             <div class="columns">
