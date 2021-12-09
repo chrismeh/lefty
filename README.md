@@ -3,3 +3,22 @@
 lefty is some kind of simple metasearch engine for left-handed musical instruments (primarily guitars and
 bass guitars, at the time of writing) written in Go. At some point in the future, it is
 supposed to aggregate products for left-handed musicians from all the major european music stores.
+
+## How to run
+
+### With Docker
+
+```shell
+$ docker build -t lefty:latest .
+$ docker run -p 5000:5000 lefty:latest
+```
+
+Visit `http://localhost:5000`.
+
+
+### With Go installed locally
+
+```shell
+$ cd cmd/web 
+$ go run .
+```
