@@ -2,13 +2,30 @@ package main
 
 import (
 	"github.com/chrismeh/lefty/pkg/products"
+	"io"
 	"math"
 	"net/http"
+	"os"
 	"strconv"
 )
 
 func (a application) handleShowIndex(w http.ResponseWriter, _ *http.Request) {
-	a.mustRenderTemplate(w, "index", nil)
+	file, err := os.Open("./templates/index.html")
+	if err != nil {
+		a.errorLog.Printf("could not open template index.html: %s", err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		a.errorLog.Printf("could not read template index.html: %s", err.Error())
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	_, _ = w.Write(content)
 }
 
 func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
