@@ -7,6 +7,10 @@ import (
 	"strconv"
 )
 
+func (a application) handleShowIndex(w http.ResponseWriter, _ *http.Request) {
+	a.mustRenderTemplate(w, "index", nil)
+}
+
 func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		a.jsonError(w, "Method not allowed", http.StatusMethodNotAllowed)

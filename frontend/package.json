@@ -1,0 +1,10 @@
+{
+  "name": "lefty",
+  "version": "1.0.0",
+  "description": "a soon-to-be metasearch engine for left-handed musical instruments",
+  "author": "Christian Mehring",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "bulma": "^0.9.3"
+  }
+}

@@ -4,11 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"github.com/chrismeh/lefty/internal/inmem"
 	"github.com/chrismeh/lefty/pkg/retailer"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -29,6 +32,8 @@ func main() {
 	}
 
 	router := http.NewServeMux()
+	router.Handle("/static/", http.StripPrefix("/static", http.FileServer(http.Dir("./static"))))
+	router.HandleFunc("/", app.handleShowIndex)
 	router.HandleFunc("/api/products", app.handleGetProducts)
 
 	s := &http.Server{
@@ -58,6 +63,32 @@ func (a application) jsonError(w http.ResponseWriter, error string, code int) {
 	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(code)
 	_ = json.NewEncoder(w).Encode(map[string]string{"message": error})
+}
+
+func (a application) mustRenderTemplate(w http.ResponseWriter, page string, data interface{}) {
+	if !strings.HasSuffix(page, ".page.gohtml") {
+		page += ".page.gohtml"
+	}
+
+	tpl, err := template.New(page).ParseFiles("./templates/" + page)
+	if err != nil {
+		panic(fmt.Errorf("could not create template for page %s: %w", page, err))
+	}
+
+	tpl, err = tpl.ParseGlob("./templates/*.layout.gohtml")
+	if err != nil {
+		panic(fmt.Errorf("could not load layouts for page %s: %w", page, err))
+	}
+
+	tpl, err = tpl.ParseGlob("./templates/*.partial.gohtml")
+	if err != nil {
+		panic(fmt.Errorf("could not load partials for page %s: %w", page, err))
+	}
+
+	err = tpl.Execute(w, data)
+	if err != nil {
+		panic(fmt.Errorf("could not execute template for page %s: %w", page, err))
+	}
 }
 
 func (a application) updateRetailers() {
