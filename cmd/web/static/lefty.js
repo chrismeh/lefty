@@ -2,15 +2,18 @@ let app = new Vue({
     el: '#app',
     data: {
         "products": [],
+        "pagination": null,
         "order": "price",
         "search": "",
         "retailer": "",
+        "requestedPage": 1,
     },
     methods: {
         fetchProducts: async function () {
             const response = await fetch(this.buildApiUrl());
             const json = await response.json();
             this.products = json.data;
+            this.pagination = json.meta;
         },
         resetSearchTerm: async function() {
             this.search = "";
@@ -22,10 +25,14 @@ let app = new Vue({
             if (search.length > 2) {
                 url += `&search=${search}`
             }
+
             if (this.retailer !== "") {
                 url += `&retailer=${this.retailer}`
             }
 
+            if (this.requestedPage > 1) {
+                url += `&page=${this.requestedPage}`
+            }
             return url
         }
     },
@@ -38,7 +45,10 @@ let app = new Vue({
         },
         search: debounce(async function() {
             await this.fetchProducts();
-        }, 500)
+        }, 500),
+        requestedPage: async function() {
+            await this.fetchProducts();
+        }
     },
     mounted: async function () {
        await this.fetchProducts();
