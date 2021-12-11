@@ -39,7 +39,7 @@
                 <div v-else>
                     <h4 class="is-4 title heading">Guitars and basses</h4>
                     <div class="columns">
-                        <div class="column is-6">
+                        <div class="column is-4">
                             <div class="field">
                                 <label class="label" for="search">Search term</label>
                                 <div class="control">
@@ -49,21 +49,34 @@
                                             type="text"
                                             placeholder="Fender Telecaster"
                                             v-model="search"
-                                            @input="updateSearchTerm"
                                     >
                                 </div>
                             </div>
                         </div>
-                        <div class="column is-6">
+                        <div class="column is-4">
                             <div class="field">
                                 <label class="label" for="order">Order</label>
                                 <div class="control">
                                     <div class="select is-fullwidth">
-                                        <select id="order" v-model="order" @change="fetchProducts">
+                                        <select id="order" v-model="order">
                                             <option value="price">Price, ascending</option>
                                             <option value="-price">Price, descending</option>
                                             <option value="availability">Availability, ascending</option>
                                             <option value="-availability">Availability, descending</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-4">
+                            <div class="field">
+                                <label class="label" for="retailer">Retailer</label>
+                                <div class="control">
+                                    <div class="select is-fullwidth">
+                                        <select id="retailer" v-model="retailer">
+                                            <option value="">all</option>
+                                            <option value="Thomann">Thomann</option>
+                                            <option value="Musik Produktiv">Musik Produktiv</option>
                                         </select>
                                     </div>
                                 </div>

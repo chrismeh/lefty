@@ -4,31 +4,41 @@ let app = new Vue({
         "products": [],
         "order": "price",
         "search": "",
+        "retailer": "",
     },
     methods: {
         fetchProducts: async function () {
+            const response = await fetch(this.buildApiUrl());
+            const json = await response.json();
+            this.products = json.data;
+        },
+        resetSearchTerm: async function() {
+            this.search = "";
+            await this.fetchProducts();
+        },
+        buildApiUrl: function() {
             let url = `/api/products?order=${this.order}`
             let search = this.search.trim()
             if (search.length > 2) {
                 url += `&search=${search}`
             }
+            if (this.retailer !== "") {
+                url += `&retailer=${this.retailer}`
+            }
 
-            const response = await fetch(url);
-            const json = await response.json();
-            this.products = json.data;
-        },
-        updateSearchTerm: debounce(async function() {
-            await this.fetchProducts()
-        }, 500),
-        resetSearchTerm: async function() {
-            this.search = "";
-            await this.fetchProducts();
+            return url
         }
     },
     watch: {
         order: async function() {
             await this.fetchProducts();
-        }
+        },
+        retailer: async function() {
+            await this.fetchProducts();
+        },
+        search: debounce(async function() {
+            await this.fetchProducts();
+        }, 500)
     },
     mounted: async function () {
        await this.fetchProducts();
