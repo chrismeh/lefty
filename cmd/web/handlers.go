@@ -37,6 +37,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 	filter := products.Filter{
 		Search:          r.URL.Query().Get("search"),
 		OrderBy:         r.URL.Query().Get("order"),
+		Retailer:        r.URL.Query().Get("retailer"),
 		Page:            1,
 		ProductsPerPage: 50,
 	}

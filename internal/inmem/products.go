@@ -30,7 +30,7 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 
 	prds := make([]products.Product, 0, len(p.products))
 	for _, v := range p.products {
-		if f.Search == "" || productMatchesFilter(v, f) {
+		if productMatchesFilter(v, f) {
 			prds = append(prds, v)
 		}
 	}
@@ -100,6 +100,14 @@ func (p *ProductStore) Load(r io.Reader) error {
 }
 
 func productMatchesFilter(p products.Product, f products.Filter) bool {
+	if !f.HasFilterCriteria() {
+		return true
+	}
+
+	if f.Retailer != "" && f.Retailer != p.Retailer {
+		return false
+	}
+
 	name := strings.ToLower(p.String())
 	search := strings.ToLower(f.Search)
 

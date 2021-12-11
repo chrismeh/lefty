@@ -37,6 +37,11 @@ func (p Product) String() string {
 type Filter struct {
 	Search          string
 	OrderBy         string
+	Retailer        string
 	Page            uint
 	ProductsPerPage uint
+}
+
+func (f Filter) HasFilterCriteria() bool {
+	return f.Search != "" || f.Retailer != ""
 }
