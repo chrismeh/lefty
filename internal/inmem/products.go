@@ -3,7 +3,7 @@ package inmem
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/chrismeh/lefty/pkg/products"
+	"github.com/chrismeh/lefty/pkg/retailer"
 	"io"
 	"math"
 	"sort"
@@ -13,22 +13,22 @@ import (
 )
 
 type ProductStore struct {
-	products map[string]products.Product
+	products map[string]retailer.Product
 	mu       *sync.Mutex
 }
 
 func NewProductStore() *ProductStore {
 	return &ProductStore{
-		products: make(map[string]products.Product),
+		products: make(map[string]retailer.Product),
 		mu:       &sync.Mutex{},
 	}
 }
 
-func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
+func (p *ProductStore) FindAll(f retailer.Filter) ([]retailer.Product, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
-	prds := make([]products.Product, 0, len(p.products))
+	prds := make([]retailer.Product, 0, len(p.products))
 	for _, v := range p.products {
 		if productMatchesFilter(v, f) {
 			prds = append(prds, v)
@@ -40,11 +40,11 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 
 	sort.Slice(prds, func(i, j int) bool {
 		switch f.OrderBy {
-		case products.OrderPriceDesc:
+		case retailer.OrderPriceDesc:
 			return prds[i].Price > prds[j].Price
-		case products.OrderByAvailabilityAsc:
+		case retailer.OrderByAvailabilityAsc:
 			return prds[i].AvailabilityScore < prds[j].AvailabilityScore
-		case products.OrderByAvailabilityDesc:
+		case retailer.OrderByAvailabilityDesc:
 			return prds[i].AvailabilityScore > prds[j].AvailabilityScore
 		default:
 			return prds[i].Price < prds[j].Price
@@ -54,7 +54,7 @@ func (p *ProductStore) FindAll(f products.Filter) ([]products.Product, error) {
 	return paginate(prds, f), nil
 }
 
-func (p *ProductStore) Count(f products.Filter) int {
+func (p *ProductStore) Count(f retailer.Filter) int {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -68,7 +68,7 @@ func (p *ProductStore) Count(f products.Filter) int {
 	return count
 }
 
-func (p *ProductStore) Upsert(products []products.Product) error {
+func (p *ProductStore) Upsert(products []retailer.Product) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -99,7 +99,7 @@ func (p *ProductStore) Load(r io.Reader) error {
 	return json.NewDecoder(r).Decode(&p.products)
 }
 
-func productMatchesFilter(p products.Product, f products.Filter) bool {
+func productMatchesFilter(p retailer.Product, f retailer.Filter) bool {
 	if !f.HasFilterCriteria() {
 		return true
 	}
@@ -114,7 +114,7 @@ func productMatchesFilter(p products.Product, f products.Filter) bool {
 	return strings.Contains(name, search)
 }
 
-func paginate(prds []products.Product, f products.Filter) []products.Product {
+func paginate(prds []retailer.Product, f retailer.Filter) []retailer.Product {
 	count := uint(len(prds))
 	if f.Page == 0 {
 		f.Page = 1
@@ -141,6 +141,6 @@ func paginate(prds []products.Product, f products.Filter) []products.Product {
 	return prds[offset : offset+limit]
 }
 
-func buildProductKey(p products.Product) string {
+func buildProductKey(p retailer.Product) string {
 	return fmt.Sprintf("%s-%s-%s", p.Retailer, p.Manufacturer, p.Model)
 }

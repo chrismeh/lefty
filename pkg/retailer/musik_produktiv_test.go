@@ -2,7 +2,6 @@ package retailer
 
 import (
 	"bytes"
-	"github.com/chrismeh/lefty/pkg/products"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -54,10 +53,10 @@ func TestMusikProduktiv_LoadProducts(t *testing.T) {
 		response, err := mp.LoadProducts("e-gitarre-linkshaender", RequestOptions{})
 		assert.NoError(t, err)
 
-		assert.Equal(t, products.AvailabilityAvailable, response.Products[0].AvailabilityScore)
-		assert.Equal(t, products.AvailabilityWithinDays, response.Products[11].AvailabilityScore)
-		assert.Equal(t, products.AvailabilityWithinWeeks, response.Products[12].AvailabilityScore)
-		assert.Equal(t, products.AvailabilityUnknown, response.Products[13].AvailabilityScore)
+		assert.Equal(t, AvailabilityAvailable, response.Products[0].AvailabilityScore)
+		assert.Equal(t, AvailabilityWithinDays, response.Products[11].AvailabilityScore)
+		assert.Equal(t, AvailabilityWithinWeeks, response.Products[12].AvailabilityScore)
+		assert.Equal(t, AvailabilityUnknown, response.Products[13].AvailabilityScore)
 	})
 
 	t.Run("parse pagination when there is only a single page", func(t *testing.T) {

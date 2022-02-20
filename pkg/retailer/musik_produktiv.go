@@ -3,7 +3,6 @@ package retailer
 import (
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/chrismeh/lefty/pkg/products"
 	"regexp"
 	"strconv"
 	"strings"
@@ -47,7 +46,7 @@ func (m *MusikProduktiv) LoadProducts(category string, options RequestOptions) (
 	})
 
 	instrumentNodes := doc.Find("ul.artgrid li")
-	instruments := make([]products.Product, len(instrumentNodes.Nodes))
+	instruments := make([]Product, len(instrumentNodes.Nodes))
 	instrumentNodes.Each(func(i int, s *goquery.Selection) {
 		p, err := m.parseProduct(s)
 		if err != nil {
@@ -84,14 +83,14 @@ func (m *MusikProduktiv) buildURL(category string, options RequestOptions) strin
 	return fmt.Sprintf("https://www.musik-produktiv.de/%s/?p=%d", category, page)
 }
 
-func (m *MusikProduktiv) parseProduct(s *goquery.Selection) (products.Product, error) {
+func (m *MusikProduktiv) parseProduct(s *goquery.Selection) (Product, error) {
 	manufacturer, model := m.parseProductName(s.Find("b").First().Text())
 	price, err := m.parsePrice(s.Find("i").Text())
 	if err != nil {
-		return products.Product{}, err
+		return Product{}, err
 	}
 
-	return products.Product{
+	return Product{
 		Retailer:          "Musik Produktiv",
 		Manufacturer:      manufacturer,
 		Model:             model,
@@ -129,16 +128,16 @@ func (m *MusikProduktiv) parsePrice(price string) (float64, error) {
 func (m *MusikProduktiv) parseAvailabilityScore(s *goquery.Selection) int {
 	s = s.Find(".ampel")
 	if s.HasClass("ggg") {
-		return products.AvailabilityAvailable
+		return AvailabilityAvailable
 	}
 	if s.HasClass("ggy") {
-		return products.AvailabilityWithinDays
+		return AvailabilityWithinDays
 	}
 	if s.HasClass("gyy") {
-		return products.AvailabilityWithinWeeks
+		return AvailabilityWithinWeeks
 	}
 
-	return products.AvailabilityUnknown
+	return AvailabilityUnknown
 }
 
 func (m *MusikProduktiv) parsePagination(s *goquery.Document) (currentPage, lastPage int, err error) {

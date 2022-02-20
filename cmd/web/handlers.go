@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/chrismeh/lefty/pkg/products"
+	"github.com/chrismeh/lefty/pkg/retailer"
 	"io"
 	"math"
 	"net/http"
@@ -34,7 +34,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filter := products.Filter{
+	filter := retailer.Filter{
 		Search:          r.URL.Query().Get("search"),
 		OrderBy:         r.URL.Query().Get("order"),
 		Retailer:        r.URL.Query().Get("retailer"),
@@ -73,7 +73,7 @@ func (a application) handleGetProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 type response struct {
-	Data []products.Product `json:"data"`
+	Data []retailer.Product `json:"data"`
 	Meta meta               `json:"meta"`
 }
 

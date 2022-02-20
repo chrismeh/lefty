@@ -1,7 +1,7 @@
 package inmem
 
 import (
-	"github.com/chrismeh/lefty/pkg/products"
+	"github.com/chrismeh/lefty/pkg/retailer"
 	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
@@ -14,26 +14,26 @@ func TestProductStore_Count(t *testing.T) {
 	t.Run("return number of products", func(t *testing.T) {
 		t.Parallel()
 
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
 		}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		count := store.Count(products.Filter{})
+		count := store.Count(retailer.Filter{})
 		assert.Equal(t, 2, count)
 	})
 
 	t.Run("return number of products that match the filter criteria", func(t *testing.T) {
 		t.Parallel()
 
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
 		}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		count := store.Count(products.Filter{Search: "Fender"})
+		count := store.Count(retailer.Filter{Search: "Fender"})
 		assert.Equal(t, 1, count)
 	})
 }
@@ -44,10 +44,10 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("return a slice of products", func(t *testing.T) {
 		t.Parallel()
 
-		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
-		store := ProductStore{products: map[string]products.Product{"foo": p}, mu: &sync.Mutex{}}
+		p := retailer.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+		store := ProductStore{products: map[string]retailer.Product{"foo": p}, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll(products.Filter{})
+		prds, err := store.FindAll(retailer.Filter{})
 		assert.NoError(t, err)
 
 		assert.Len(t, prds, 1)
@@ -58,12 +58,12 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("return a paginated slice of products", func(t *testing.T) {
 		t.Parallel()
 
-		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
-		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
-		productMap := map[string]products.Product{"foo": p1, "bar": p2}
+		p1 := retailer.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		p2 := retailer.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		productMap := map[string]retailer.Product{"foo": p1, "bar": p2}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		filter := products.Filter{Page: 2, ProductsPerPage: 1}
+		filter := retailer.Filter{Page: 2, ProductsPerPage: 1}
 		prds, err := store.FindAll(filter)
 		assert.NoError(t, err)
 
@@ -74,7 +74,7 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("apply default pagination settings when pagination data is invalid", func(t *testing.T) {
 		t.Parallel()
 
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394},
 		}
@@ -94,7 +94,7 @@ func TestProductStore_FindAll(t *testing.T) {
 			t.Run(tt.Name, func(t *testing.T) {
 				t.Parallel()
 
-				filter := products.Filter{Page: tt.Page, ProductsPerPage: tt.ProductsPerPage}
+				filter := retailer.Filter{Page: tt.Page, ProductsPerPage: tt.ProductsPerPage}
 				prds, err := store.FindAll(filter)
 				assert.NoError(t, err)
 
@@ -106,14 +106,14 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("return slice of remaining products on the last page", func(t *testing.T) {
 		t.Parallel()
 
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394},
 			"baz": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH 3TSB", Price: 1799},
 		}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll(products.Filter{Page: 2, ProductsPerPage: 2})
+		prds, err := store.FindAll(retailer.Filter{Page: 2, ProductsPerPage: 2})
 		assert.NoError(t, err)
 
 		assert.Len(t, prds, 1)
@@ -123,7 +123,7 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("return only products that match the search term", func(t *testing.T) {
 		t.Parallel()
 
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
 		}
@@ -155,7 +155,7 @@ func TestProductStore_FindAll(t *testing.T) {
 			t.Run(tt.Name, func(t *testing.T) {
 				t.Parallel()
 
-				prds, err := store.FindAll(products.Filter{Search: tt.Search})
+				prds, err := store.FindAll(retailer.Filter{Search: tt.Search})
 				assert.NoError(t, err)
 
 				assert.Len(t, prds, 1)
@@ -165,13 +165,13 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("return only products that match the retailer filter criteria", func(t *testing.T) {
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Retailer: "Thomann", Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819},
 			"bar": {Retailer: "Musik Produktiv", Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449},
 		}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll(products.Filter{Retailer: "Thomann"})
+		prds, err := store.FindAll(retailer.Filter{Retailer: "Thomann"})
 		assert.NoError(t, err)
 
 		assert.Len(t, prds, 1)
@@ -181,12 +181,12 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("sort by price ascending by default", func(t *testing.T) {
 		t.Parallel()
 
-		p1 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
-		p2 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
-		productMap := map[string]products.Product{"foo": p1, "bar": p2}
+		p1 := retailer.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		p2 := retailer.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		productMap := map[string]retailer.Product{"foo": p1, "bar": p2}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll(products.Filter{})
+		prds, err := store.FindAll(retailer.Filter{})
 		assert.NoError(t, err)
 
 		assert.Equal(t, float64(394), prds[0].Price)
@@ -196,12 +196,12 @@ func TestProductStore_FindAll(t *testing.T) {
 	t.Run("allow sorting by price descending", func(t *testing.T) {
 		t.Parallel()
 
-		p1 := products.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
-		p2 := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
-		productMap := map[string]products.Product{"foo": p1, "bar": p2}
+		p1 := retailer.Product{Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394}
+		p2 := retailer.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819}
+		productMap := map[string]retailer.Product{"foo": p1, "bar": p2}
 		store := ProductStore{products: productMap, mu: &sync.Mutex{}}
 
-		prds, err := store.FindAll(products.Filter{OrderBy: products.OrderPriceDesc})
+		prds, err := store.FindAll(retailer.Filter{OrderBy: retailer.OrderPriceDesc})
 		assert.NoError(t, err)
 
 		assert.Equal(t, float64(1819), prds[0].Price)
@@ -209,7 +209,7 @@ func TestProductStore_FindAll(t *testing.T) {
 	})
 
 	t.Run("allow sorting by availability", func(t *testing.T) {
-		productMap := map[string]products.Product{
+		productMap := map[string]retailer.Product{
 			"foo": {Manufacturer: "Fender", Model: "SQ CV 60s Jazzmaster LH LRL OW", Price: 394, AvailabilityScore: 2},
 			"bar": {Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS", Price: 1819, AvailabilityScore: 1},
 			"baz": {Manufacturer: "Epiphone", Model: "SG Standard Alpine White LH", Price: 449, AvailabilityScore: 3},
@@ -227,7 +227,7 @@ func TestProductStore_FindAll(t *testing.T) {
 
 		for _, tt := range tests {
 			t.Run(tt.Name, func(t *testing.T) {
-				prds, err := store.FindAll(products.Filter{OrderBy: tt.Order})
+				prds, err := store.FindAll(retailer.Filter{OrderBy: tt.Order})
 				assert.NoError(t, err)
 
 				assert.Equal(t, tt.ExpectedModel, prds[0].Model)
@@ -242,10 +242,10 @@ func TestProductStore_Upsert(t *testing.T) {
 	t.Run("save a new product", func(t *testing.T) {
 		t.Parallel()
 
-		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+		p := retailer.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
 		store := NewProductStore()
 
-		err := store.Upsert([]products.Product{p})
+		err := store.Upsert([]retailer.Product{p})
 
 		assert.NoError(t, err)
 		assert.Len(t, store.products, 1)
@@ -258,10 +258,10 @@ func TestProductStore_Upsert(t *testing.T) {
 	t.Run("set timestamps when saving a new product", func(t *testing.T) {
 		t.Parallel()
 
-		p := products.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
+		p := retailer.Product{Manufacturer: "Fender", Model: "AM Pro II Jazzmaster LH MN MYS"}
 		store := NewProductStore()
 
-		_ = store.Upsert([]products.Product{p})
+		_ = store.Upsert([]retailer.Product{p})
 
 		pk := buildProductKey(p)
 		assert.Equal(t, store.products[pk].CreatedAt, store.products[pk].UpdatedAt)
@@ -272,16 +272,16 @@ func TestProductStore_Upsert(t *testing.T) {
 	t.Run("setUpdatedAt timestamp when saving an existing product", func(t *testing.T) {
 		t.Parallel()
 
-		p := products.Product{
+		p := retailer.Product{
 			Manufacturer: "Fender",
 			Model:        "AM Pro II Jazzmaster LH MN MYS",
 			CreatedAt:    time.Date(2014, 8, 6, 23, 0, 0, 0, time.UTC),
 			UpdatedAt:    time.Date(2014, 8, 6, 23, 0, 0, 0, time.UTC),
 		}
 		pk := buildProductKey(p)
-		store := ProductStore{products: map[string]products.Product{pk: p}, mu: &sync.Mutex{}}
+		store := ProductStore{products: map[string]retailer.Product{pk: p}, mu: &sync.Mutex{}}
 
-		_ = store.Upsert([]products.Product{p})
+		_ = store.Upsert([]retailer.Product{p})
 
 		assert.NotEqual(t, store.products[pk].CreatedAt, store.products[pk].UpdatedAt)
 

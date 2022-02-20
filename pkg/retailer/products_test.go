@@ -1,4 +1,4 @@
-package products
+package retailer
 
 import (
 	"github.com/stretchr/testify/assert"

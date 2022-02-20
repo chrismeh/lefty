@@ -3,7 +3,6 @@ package retailer
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/chrismeh/lefty/pkg/products"
 	"io/ioutil"
 	"regexp"
 	"strconv"
@@ -82,8 +81,8 @@ type page struct {
 	Pagination  pagination  `json:"pagingSettings"`
 }
 
-func (p page) products() []products.Product {
-	pr := make([]products.Product, len(p.ArticleList.Articles))
+func (p page) products() []Product {
+	pr := make([]Product, len(p.ArticleList.Articles))
 	for k, v := range p.ArticleList.Articles {
 		price, err := strconv.ParseFloat(v.Price.Primary.Raw, 32)
 		if err != nil {
@@ -93,7 +92,7 @@ func (p page) products() []products.Product {
 		productURL := fmt.Sprintf("https://www.thomann.de/de/%s", v.Link)
 		thumbnailURL := fmt.Sprintf("https://thumbs.static-thomann.de/thumb/thumb220x220/pics/prod/%s", v.Image.Name)
 
-		pr[k] = products.Product{
+		pr[k] = Product{
 			Retailer:          "Thomann",
 			Manufacturer:      v.Manufacturer,
 			Model:             v.Model,
@@ -132,13 +131,13 @@ type availability struct {
 func (a availability) Score() int {
 	switch a.Status {
 	case 1:
-		return products.AvailabilityAvailable
+		return AvailabilityAvailable
 	case 2:
-		return products.AvailabilityWithinDays
+		return AvailabilityWithinDays
 	case 4:
-		return products.AvailabilityWithinWeeks
+		return AvailabilityWithinWeeks
 	default:
-		return products.AvailabilityUnknown
+		return AvailabilityUnknown
 	}
 }
 

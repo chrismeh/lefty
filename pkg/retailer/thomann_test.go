@@ -2,7 +2,6 @@ package retailer
 
 import (
 	"bytes"
-	"github.com/chrismeh/lefty/pkg/products"
 	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net/http"
@@ -30,7 +29,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 		assert.Equal(t, "6 saitige Linkshänder E-Bässe", prds[0].Category)
 		assert.Equal(t, true, prds[0].IsAvailable)
 		assert.Equal(t, "In 4–5 Wochen lieferbar", prds[0].AvailabilityInfo)
-		assert.Equal(t, products.AvailabilityWithinWeeks, prds[0].AvailabilityScore)
+		assert.Equal(t, AvailabilityWithinWeeks, prds[0].AvailabilityScore)
 		assert.Equal(t, float64(599), prds[0].Price)
 		assert.Equal(t, "https://www.thomann.de/de/esp_ltd_b206sm_natural_satin_left_443915.htm?listPosition=0", prds[0].ProductURL)
 		assert.Equal(t, "https://thumbs.static-thomann.de/thumb/thumb220x220/pics/prod/443915.jpg", prds[0].ThumbnailURL)
@@ -41,7 +40,7 @@ func TestThomann_LoadProducts(t *testing.T) {
 		assert.Equal(t, "6 saitige Linkshänder E-Bässe", prds[1].Category)
 		assert.Equal(t, true, prds[1].IsAvailable)
 		assert.Equal(t, "In 8–10 Wochen lieferbar", prds[1].AvailabilityInfo)
-		assert.Equal(t, products.AvailabilityWithinWeeks, prds[1].AvailabilityScore)
+		assert.Equal(t, AvailabilityWithinWeeks, prds[1].AvailabilityScore)
 		assert.Equal(t, float64(925), prds[1].Price)
 		assert.Equal(t, "https://www.thomann.de/de/warwick_rb_corvette_basic_6_sbhp_lh.htm?listPosition=1", prds[1].ProductURL)
 		assert.Equal(t, "https://thumbs.static-thomann.de/thumb/thumb220x220/pics/prod/450435.jpg", prds[1].ThumbnailURL)
@@ -126,10 +125,10 @@ func TestAvailability_Score(t *testing.T) {
 		Status        int
 		ExpectedScore int
 	}{
-		{Name: "product available", Status: 1, ExpectedScore: products.AvailabilityAvailable},
-		{Name: "product available in days", Status: 2, ExpectedScore: products.AvailabilityWithinDays},
-		{Name: "product available in weeks", Status: 4, ExpectedScore: products.AvailabilityWithinWeeks},
-		{Name: "product availability unknown", Status: 1337, ExpectedScore: products.AvailabilityUnknown},
+		{Name: "product available", Status: 1, ExpectedScore: AvailabilityAvailable},
+		{Name: "product available in days", Status: 2, ExpectedScore: AvailabilityWithinDays},
+		{Name: "product available in weeks", Status: 4, ExpectedScore: AvailabilityWithinWeeks},
+		{Name: "product availability unknown", Status: 1337, ExpectedScore: AvailabilityUnknown},
 	}
 
 	for _, tt := range tests {
